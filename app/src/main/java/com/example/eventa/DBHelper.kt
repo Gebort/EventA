@@ -3,6 +3,7 @@ package com.example.eventa
 import android.util.Log
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -10,6 +11,10 @@ import java.util.*
 import kotlin.reflect.KFunction1
 
 object DBHelper {
+
+    var avalEventsListener: ListenerRegistration? = null
+    var followedEventsListener: ListenerRegistration? = null
+    var orgEventsListener: ListenerRegistration? = null
 
      fun emailCheck(
              email: String,
@@ -150,28 +155,12 @@ object DBHelper {
     }
 
     fun loadOrganisedEvents(email: String, callback: (Boolean, List<Event>?) -> Unit){
-
-//        val db = Firebase.firestore
-//        val events = mutableListOf<Event>()
-//        db.collection("cities").document(User.city.toLowerCase()).collection("events").whereEqualTo("orgEmail", email)
-//                .get()
-//                .addOnSuccessListener { docs ->
-//                    for (doc in docs){
-//                        val event = doc.toObject(Event::class.java)
-//                        event.id = doc.id
-//                        event.city = User.city.toLowerCase()
-//                        events.add(event)
-//                    }
-//                    events.sortBy { it.date }
-//                    callback(true, events)
-//                }
-//                .addOnFailureListener {
-//                    callback(false, null)
-//                }
-
         //TODO поиск не только по городу пользователя но и по none
         val db = Firebase.firestore
-        db.collection("cities").document(User.city.toLowerCase(Locale.ROOT)).collection("events").whereEqualTo("orgEmail", email)
+
+        orgEventsListener?.remove()
+
+        orgEventsListener = db.collection("cities").document(User.city.toLowerCase(Locale.ROOT)).collection("events").whereEqualTo("orgEmail", email)
                 .addSnapshotListener { value, error ->
                     val events = mutableListOf<Event>()
                     if (error != null) {
