@@ -59,6 +59,8 @@ class allEventsAdapter(private val events: List<Event>):
         h.time?.text = "${events[i].hour}:${events[i].min}"
         h.title?.text = events[i].title
         h.extraLayout?.visibility = View.GONE
+        //TODO Если событие не исчезло из списка, то при апдейте списка кнопка снова станет активной
+        h.signup?.isEnabled = true
 
         val isExpanded = i == mExpandedPosition
         h.extraLayout?.visibility = if (isExpanded) View.VISIBLE else View.GONE
@@ -74,6 +76,7 @@ class allEventsAdapter(private val events: List<Event>):
 
         h.signup?.setOnClickListener {
             h.signup?.isEnabled = false
+            mExpandedPosition = -1
             DBHelper.addParticipant(events[i].id!!, events[i].city!!, User.email, ::onAddResult)
         }
 

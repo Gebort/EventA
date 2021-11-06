@@ -7,8 +7,10 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.example.eventa.DBHelper
 import com.example.eventa.Event
 import com.example.eventa.R
+import com.example.eventa.User
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -63,6 +65,8 @@ class followedEventsAdapter(private val events: List<Event>):
         h.time?.text = "${events[i].hour}:${events[i].min}"
         h.orgName?.text = "Organisator - ${events[i].orgName}"
         h.title?.text = events[i].title
+        //TODO Если событие не исчезло из списка, то при апдейте списка кнопка снова станет активной
+        h.unsign?.isEnabled = true
         if(events[i].showEmail){
             h.orgEmail?.text = "Email - ${events[i].orgEmail}"
             h.orgEmail?.visibility = View.VISIBLE
@@ -96,7 +100,8 @@ class followedEventsAdapter(private val events: List<Event>):
 
         h.unsign?.setOnClickListener {
             h.unsign?.isEnabled = false
-            //TODO возможность отписываться от событий
+            mExpandedPosition = -1
+            DBHelper.removeParticipant(events[i].id!!, events[i].city!!, User.email, ::onRemoveResult)
         }
 
     }
@@ -105,7 +110,7 @@ class followedEventsAdapter(private val events: List<Event>):
         return events.size
     }
 
-    fun onAddResult(result: Boolean){
+    fun onRemoveResult(result: Boolean){
 
     }
 
