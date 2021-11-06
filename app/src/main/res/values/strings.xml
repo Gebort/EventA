@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">EventA</string>
+    <string name="no_place">No physical place</string>
+    <string name="no_city">None</string>
+    <string name="warning_invalid_login">Invalid login or password</string>
+    <string name="warning_google_signin_failed">Unable to login</string>
+    <string name="warning_failed_to_change_data">Failed to change data</string>
+    <string name="warning_verificate_account">Please verificate account\nLetter sent to your email</string>
+    <string name="warning_email">Incorrect email</string>
+    <string name="warning_name">Incorrect name</string>
+    <string name="warning_age">Incorrect age</string>
+    <string name="warning_age_limit">You must be 14+ for registration</string>
+    <string name="warning_phone">Incorrect phone</string>
+    <string name="warning_desc_size">Description oversize. Limit - 200 symbols</string>
+    <string name="warning_password">Incorrect password</string>
+    <string name="warning_password_size">Password must be at least 8 symbols</string>
+    <string name="warning_passwords_match">Passwords not the same</string>
+    <string name="warning_city">Incorrect city</string>
+    <string name="warning_registration_failed">Registration failed</string>
+    <string name="organised">Organised</string>
+    <string name="followed">Followed</string>
+    <string name="empty_list">No events to show you</string>
+
+</resources>

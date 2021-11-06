@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/allEvents">
+
+    <fragment
+        android:id="@+id/allEvents"
+        android:name="com.example.eventa.mainFragments.AllEvents"
+        android:label="fragment_all_events"
+        tools:layout="@layout/fragment_all_events" />
+    <fragment
+        android:id="@+id/myEvents"
+        android:name="com.example.eventa.mainFragments.MyEvents"
+        android:label="fragment_my_events"
+        tools:layout="@layout/fragment_my_events" >
+        <action
+            android:id="@+id/action_myEvents_to_followedEvents"
+            app:destination="@id/followedEvents" />
+        <action
+            android:id="@+id/action_myEvents_to_orginisedEvents"
+            app:destination="@id/orginisedEvents" />
+        <action
+            android:id="@+id/action_myEvents_to_orginisedEvents2"
+            app:destination="@id/orginisedEvents" />
+        <action
+            android:id="@+id/action_myEvents_to_orgEvents"
+            app:destination="@id/orgEvents"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out"
+            app:popUpTo="@id/myEvents"
+            app:popUpToInclusive="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/orgEvents"
+        android:name="com.example.eventa.mainFragments.OrgEvents"
+        android:label="fragment_org_events"
+        tools:layout="@layout/fragment_org_events" />
+    <fragment
+        android:id="@+id/settings"
+        android:name="com.example.eventa.mainFragments.Settings"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settings_to_loginActivity"
+            app:destination="@id/loginActivity"
+            app:popUpTo="@id/settings"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.example.eventa.loginFragments.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
+    <fragment
+        android:id="@+id/followedEvents"
+        android:name="com.example.eventa.mainFragments.FollowedEvents"
+        android:label="fragment_followed_events"
+        tools:layout="@layout/fragment_followed_events" />
+    <fragment
+        android:id="@+id/orginisedEvents"
+        android:name="com.example.eventa.mainFragments.OrginisedEvents"
+        android:label="fragment_orginised_events"
+        tools:layout="@layout/fragment_orginised_events" />
+</navigation>

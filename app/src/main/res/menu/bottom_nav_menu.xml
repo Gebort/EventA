@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/settings"
+        android:title="Profile"
+        android:icon="@drawable/profile_icon"/>
+    <item
+        android:id="@+id/allEvents"
+        android:title="Search"
+        android:icon="@drawable/all_events_icon"/>
+    <item
+        android:id="@+id/myEvents"
+        android:title="Followed"
+        android:icon="@drawable/my_events_icon"/>
+
+</menu>
