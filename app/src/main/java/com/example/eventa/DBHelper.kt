@@ -1,12 +1,11 @@
 package com.example.eventa
 
 import android.util.Log
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.Query
+import com.example.eventa.viewModels.allEventsViewModel
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import org.w3c.dom.Document
 import java.util.*
 import kotlin.reflect.KFunction1
 
@@ -125,61 +124,37 @@ object DBHelper {
 
     }
 
-    fun loadAvalEvents(email: String, city: String, age: Int, callback: (Boolean, List<Event>?) -> Unit) {
-
-//        val db = Firebase.firestore
-//        val events = mutableListOf<Event>()
-//        db.collection("cities").document(city.toLowerCase(Locale.ROOT)).collection("events").whereLessThanOrEqualTo("minAge", age)
-//                .get()
-//                .addOnSuccessListener { docs ->
-//                    for (doc in docs) {
-//                        val event = doc.toObject(Event::class.java)
-//                        if(event.orgEmail!! != email) {
-//                            if (event.users == null || !event.users!!.contains(email)) {
-//                                if (event.currPartNumber < event.partNumber && event.minAge <= age) {
-//                                    event.id = doc.id
-//                                    event.city = city.toLowerCase(Locale.ROOT)
-//                                    events.add(event)
-//                                }
-//                            }
-//                        }
-//                    }
-//                    events.sortBy { it.date }
-//                    callback(true, events)
-//                }
-//                .addOnFailureListener {
-//                    callback(false, null)
-//                }
-
+    fun loadAvalEvents(email: String, city: String, age: Int, callback: (Event, allEventsViewModel.Types) -> Unit) {
         val db = Firebase.firestore
 
         avalEventsListener?.remove()
 
         avalEventsListener = db.collection("cities").document(city.toLowerCase(Locale.ROOT)).collection("events").whereLessThanOrEqualTo("minAge", age)
                 .addSnapshotListener { value, error ->
-                    if (error != null){
+                    if (error != null) {
                         Log.d("DBHelper", "Failed to load aval events: $error")
-                        callback(false, null)
-                    }
-                    else if (value != null){
-                        val events = mutableListOf<Event>()
-                        for (doc in value) {
-                            val event = doc.toObject(Event::class.java)
-                            if(event.orgEmail!! != email) {
-                                if (event.users == null || !event.users!!.contains(email)) {
-                                    if (event.currPartNumber < event.partNumber && event.minAge <= age) {
-                                        event.id = doc.id
-                                        event.city = city.toLowerCase(Locale.ROOT)
-                                        events.add(event)
+                    } else {
+                        if (value != null) {
+                            for (doc in value.documentChanges) {
+                                val event = doc.document.toObject(Event::class.java)
+                                event.id = doc.document.id
+                                event.city = User.city.toLowerCase(Locale.ROOT)
+                                if (event.users == null) {
+                                    event.users = listOf()
+                                }
+                                when (doc.type) {
+                                    DocumentChange.Type.ADDED -> {
+                                        callback(event, allEventsViewModel.Types.ADDED)
+                                    }
+                                    DocumentChange.Type.MODIFIED -> {
+                                        callback(event, allEventsViewModel.Types.MODIFIED)
+                                    }
+                                    DocumentChange.Type.REMOVED -> {
+                                        callback(event, allEventsViewModel.Types.REMOVED)
                                     }
                                 }
                             }
                         }
-                        events.sortBy { it.date }
-                        callback(true, events)
-                    }
-                    else {
-                        callback(true, null)
                     }
                 }
     }
@@ -215,25 +190,6 @@ object DBHelper {
     }
 
     fun loadFollowedEvents(email: String, callback: (Boolean, List<Event>?) -> Unit){
-
-//        val db = Firebase.firestore
-//        val events = mutableListOf<Event>()
-//        db.collection("cities").document(User.city.toLowerCase()).collection("events").whereArrayContains("users", email)
-//                .get()
-//                .addOnSuccessListener { docs ->
-//                    for (doc in docs){
-//                        val event = doc.toObject(Event::class.java)
-//                        event.id = doc.id
-//                        event.city = User.city.toLowerCase()
-//                        events.add(event)
-//                    }
-//                    events.sortBy { it.date }
-//                    callback(true, events)
-//                }
-//                .addOnFailureListener {
-//                    callback(false, null)
-//                }
-
         val db = Firebase.firestore
 
         followedEventsListener?.remove()
@@ -274,17 +230,6 @@ object DBHelper {
                 .addOnFailureListener{
                     callback(false)
         }
-
-//        db.collection("cities").document(city.toLowerCase()).collection("events").document(id).collection("participants").document(email).set(docData)
-//                .addOnSuccessListener {
-//                    db.collection("cities").document(city.toLowerCase()).collection("events").document(id)
-//                            .update("currPartNumber", FieldValue.increment(1))
-//
-//                    callback(true)
-//                }
-//                .addOnFailureListener {
-//                    callback(false)
-//                }
     }
 
     fun removeParticipant(id: String, city: String, email: String, callback: (Boolean) -> Unit){

@@ -4,10 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.ProgressBar
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -24,13 +21,13 @@ import com.example.eventa.viewModels.allEventsViewModel
 
 class AllEvents : Fragment() {
     //TODO добавить поиск по названию/ID события
+    //TODO краш при ручном обновлении списка
     private lateinit var spinner: Spinner
     private lateinit var prBar: ProgressBar
     private lateinit var swipeR: SwipeRefreshLayout
     private lateinit var rView: RecyclerView
     private lateinit var layoutEmpty: ConstraintLayout
     private var adapter: allEventsAdapter? = null
-    private var events = mutableListOf<Event>()
     private lateinit var v: View
 
     override fun onCreateView(
@@ -77,18 +74,23 @@ class AllEvents : Fragment() {
         rView.layoutManager = LinearLayoutManager(activity?.applicationContext)
 
         val model: allEventsViewModel by activityViewModels()
-        if (model.city != User.city){
-            updateData(data[0], User.age)
+        if(adapter == null){
+            adapter = allEventsAdapter(model.getEvents().value!!)
+            rView.adapter = adapter
+            adapter!!.notifyDataSetChanged()
         }
         activity?.let {
             model.getEvents().observe(it, { events ->
-                onEventsResult(true, events)
+                adapter!!.events = events
+                onEventsResult(model.change, model.pos, model.getEvents().value!!.size)
             })
+        }
+        if (model.city != User.city){
+            updateData(data[0], User.age)
         }
 
         return i
     }
-
 
     override fun onStop() {
         super.onStop()
@@ -115,24 +117,44 @@ class AllEvents : Fragment() {
         model.loadAllEvents()
     }
 
-    fun onEventsResult(result: Boolean, eventsNew: List<Event>?) {
+    fun onEventsResult(type: allEventsViewModel.Types, pos: Int, size: Int) {
         prBar.visibility = View.INVISIBLE
         prBar.isEnabled = false
-        if (result) {
-            if(eventsNew != null)
-                events.clear()
-                events.addAll(eventsNew!!)
-                if(events.size == 0){
-                    layoutEmpty.visibility = View.VISIBLE
-                }
-                else{
-                    layoutEmpty.visibility = View.GONE
-                }
-            if(adapter == null){
-                adapter = allEventsAdapter(events!!)
-                rView.adapter = adapter
-            }
-            adapter!!.notifyDataSetChanged()
+        if (size == 0)
+            layoutEmpty.visibility = View.VISIBLE
+        else {
+            layoutEmpty.visibility = View.GONE
         }
+
+        when (type) {
+            allEventsViewModel.Types.ADDED -> {
+                adapter!!.notifyItemInserted(pos)
+            }
+            allEventsViewModel.Types.MODIFIED -> {
+                adapter!!.notifyItemChanged(pos)
+            }
+            allEventsViewModel.Types.REMOVED -> {
+                adapter!!.notifyItemRemoved(pos)
+            }
+            allEventsViewModel.Types.CLEARED -> {
+                adapter!!.notifyDataSetChanged()
+            }
+        }
+//        if (result) {
+//            if(eventsNew != null)
+//                events.clear()
+//                events.addAll(eventsNew!!)
+//                if(events.size == 0){
+//                    layoutEmpty.visibility = View.VISIBLE
+//                }
+//                else{
+//                    layoutEmpty.visibility = View.GONE
+//                }
+//            if(adapter == null){
+//                adapter = allEventsAdapter(events!!)
+//                rView.adapter = adapter
+//            }
+//            adapter!!.notifyDataSetChanged()
+//        }
     }
 }

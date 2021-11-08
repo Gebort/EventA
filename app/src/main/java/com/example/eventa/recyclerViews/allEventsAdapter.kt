@@ -14,7 +14,8 @@ import com.example.eventa.User
 import java.text.SimpleDateFormat
 import java.util.*
 
-class allEventsAdapter(private val events: List<Event>):
+
+class allEventsAdapter(var events: MutableList<Event>):
         RecyclerView.Adapter<allEventsAdapter.MyViewHolder>(){
 
     private var mExpandedPosition = -1
@@ -59,7 +60,6 @@ class allEventsAdapter(private val events: List<Event>):
         h.time?.text = "${events[i].hour}:${events[i].min}"
         h.title?.text = events[i].title
         h.extraLayout?.visibility = View.GONE
-        //TODO Если событие не исчезло из списка, то при апдейте списка кнопка снова станет активной
         h.signup?.isEnabled = true
 
         val isExpanded = i == mExpandedPosition
@@ -69,6 +69,7 @@ class allEventsAdapter(private val events: List<Event>):
         if (isExpanded) previousExpandedPosition = i
 
         h.itemView.setOnClickListener{
+            //TODO при удалении события из списка, остается выделение уже удаленного события
             mExpandedPosition = if (isExpanded) -1 else i
             notifyItemChanged(previousExpandedPosition)
             notifyItemChanged(i)
@@ -76,7 +77,7 @@ class allEventsAdapter(private val events: List<Event>):
 
         h.signup?.setOnClickListener {
             h.signup?.isEnabled = false
-            mExpandedPosition = -1
+            previousExpandedPosition = mExpandedPosition
             DBHelper.addParticipant(events[i].id!!, events[i].city!!, User.email, ::onAddResult)
         }
 
