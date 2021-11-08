@@ -41,14 +41,6 @@ class MyEvents : Fragment() {
             }
         }.attach()
 
-        val modelFoll: followedEventsViewModel by activityViewModels()
-        modelFoll.email = User.email
-        modelFoll.loadFollowedEvents()
-
-        val model: orgEventsViewModel by activityViewModels()
-        model.email = User.email
-        model.loadOrgEvents()
-
         return i
     }
 

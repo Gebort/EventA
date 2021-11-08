@@ -14,7 +14,7 @@ import com.example.eventa.User
 import java.text.SimpleDateFormat
 import java.util.*
 
-class followedEventsAdapter(private val events: List<Event>):
+class followedEventsAdapter(var events: List<Event>):
         RecyclerView.Adapter<followedEventsAdapter.MyViewHolder>(){
 
     private var mExpandedPosition = -1

@@ -2,6 +2,8 @@ package com.example.eventa
 
 import android.util.Log
 import com.example.eventa.viewModels.allEventsViewModel
+import com.example.eventa.viewModels.followedEventsViewModel
+import com.example.eventa.viewModels.orgEventsViewModel
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -129,6 +131,7 @@ object DBHelper {
 
         avalEventsListener?.remove()
 
+        //TODO проверка на дату и время события
         avalEventsListener = db.collection("cities").document(city.toLowerCase(Locale.ROOT)).collection("events").whereLessThanOrEqualTo("minAge", age)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
@@ -159,8 +162,8 @@ object DBHelper {
                 }
     }
 
-    fun loadOrganisedEvents(email: String, callback: (Boolean, List<Event>?) -> Unit){
-        //TODO поиск не только по городу пользователя но и по none
+    fun loadOrganisedEvents(email: String, callback: (Event, Int, orgEventsViewModel.Types) -> Unit){
+        //TODO поиск не только по городу пользователя но и по none (хранить мероприятия пользователя в его отдельной базе)
         val db = Firebase.firestore
 
         orgEventsListener?.remove()
@@ -169,27 +172,49 @@ object DBHelper {
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load organised events: $error")
-                        callback(false, null)
                     }
-                    else if (value != null) {
-                        val events = mutableListOf<Event>()
-                        for (doc in value) {
-                            val event = doc.toObject(Event::class.java)
-                            event.id = doc.id
-                            event.city = User.city.toLowerCase(Locale.ROOT)
-                            events.add(event)
+                    else{
+                        if (value != null) {
+                            for (doc in value.documentChanges) {
+                                val event = doc.document.toObject(Event::class.java)
+                                event.id = doc.document.id
+                                event.city = User.city.toLowerCase(Locale.ROOT)
+                                if (event.users == null) {
+                                    event.users = listOf()
+                                }
+                                when (doc.type) {
+                                    DocumentChange.Type.ADDED -> {
+                                        callback(event, doc.newIndex , orgEventsViewModel.Types.ADDED)
+                                    }
+                                    DocumentChange.Type.MODIFIED -> {
+                                        callback(event, doc.newIndex, orgEventsViewModel.Types.MODIFIED)
+                                    }
+                                    DocumentChange.Type.REMOVED -> {
+                                        callback(event, doc.oldIndex, orgEventsViewModel.Types.REMOVED)
+                                    }
+                                }
+                            }
                         }
-                        events.sortBy { it.date }
-                        callback(true, events)
                     }
-                    else {
-                        callback(true, null)
-                    }
+//                    else if (value != null) {
+//                        val events = mutableListOf<Event>()
+//                        for (doc in value) {
+//                            val event = doc.toObject(Event::class.java)
+//                            event.id = doc.id
+//                            event.city = User.city.toLowerCase(Locale.ROOT)
+//                            events.add(event)
+//                        }
+//                        events.sortBy { it.date }
+//                        callback(true, events)
+//                    }
+//                    else {
+//                        callback(true, null)
+//                    }
                 }
 
     }
 
-    fun loadFollowedEvents(email: String, callback: (Boolean, List<Event>?) -> Unit){
+    fun loadFollowedEvents(email: String, callback: (Event, Int, followedEventsViewModel.Types) -> Unit){
         val db = Firebase.firestore
 
         followedEventsListener?.remove()
@@ -198,21 +223,29 @@ object DBHelper {
                 .addSnapshotListener { value, error ->
                     if (error != null){
                         Log.d("DBHelper", "Failed to load followed events: $error")
-                        callback(false, null)
-                    }
-                    else if (value != null){
-                        val events = mutableListOf<Event>()
-                        for (doc in value){
-                            val event = doc.toObject(Event::class.java)
-                            event.id = doc.id
-                            event.city = User.city.toLowerCase()
-                            events.add(event)
-                        }
-                        events.sortBy { it.date }
-                        callback(true, events)
                     }
                     else{
-                        callback(true, null)
+                        if (value != null) {
+                            for (doc in value.documentChanges) {
+                                val event = doc.document.toObject(Event::class.java)
+                                event.id = doc.document.id
+                                event.city = User.city.toLowerCase(Locale.ROOT)
+                                if (event.users == null) {
+                                    event.users = listOf()
+                                }
+                                when (doc.type) {
+                                    DocumentChange.Type.ADDED -> {
+                                        callback(event, doc.newIndex , followedEventsViewModel.Types.ADDED)
+                                    }
+                                    DocumentChange.Type.MODIFIED -> {
+                                        callback(event, doc.newIndex, followedEventsViewModel.Types.MODIFIED)
+                                    }
+                                    DocumentChange.Type.REMOVED -> {
+                                        callback(event, doc.oldIndex, followedEventsViewModel.Types.REMOVED)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
     }

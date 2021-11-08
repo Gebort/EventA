@@ -11,24 +11,46 @@ import com.example.eventa.User
 class orgEventsViewModel : ViewModel() {
     var email: String = ""
 
-    private val events = MutableLiveData<List<Event>>()
+    private val events = MutableLiveData<MutableList<Event>>()
+    enum class Types { ADDED, MODIFIED, REMOVED, CLEARED }
+    var change = Types.CLEARED
+    var pos: Int = -1
 
-    fun getEvents(): LiveData<List<Event>> {
+    init{
+        events.value = mutableListOf()
+    }
+
+    fun getEvents(): LiveData<MutableList<Event>> {
         return events
     }
 
     fun loadOrgEvents() {
-        if (email != "")
+        if (email != "") {
+            change = Types.CLEARED
+            events.value = mutableListOf()
             DBHelper.loadOrganisedEvents(User.email, ::onOrgEventsResult)
-        else
+        } else {
             Log.d("orgEventsViewModel", "No input data, cant load all events")
+        }
     }
 
-    private fun onOrgEventsResult(result: Boolean, newEvents: List<Event>?) {
-        if (result)
-            if (newEvents != null)
-                events.value = newEvents
-            else
-                events.value = listOf()
+    private fun onOrgEventsResult(event: Event, pos: Int, type: Types) {
+        change = type
+        this.pos = pos
+
+        when (change) {
+            Types.ADDED -> {
+                events.value!!.add(event)
+                events.value = events.value!!.sortedBy { it.date }.toMutableList()
+            }
+            Types.MODIFIED -> {
+                events.value!![pos] = event
+                events.value = events.value
+            }
+            Types.REMOVED -> {
+                events.value!!.removeAt(pos)
+                events.value = events.value
+            }
+        }
     }
 }

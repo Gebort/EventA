@@ -8,14 +8,17 @@ import com.example.eventa.mainFragments.FollowedEvents
 import com.example.eventa.mainFragments.OrginisedEvents
 
 class myEventsPagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa){
+    val orginisedEvents = OrginisedEvents()
+    val followedEvents = FollowedEvents()
+
     override fun getItemCount(): Int {
         return 2
     }
 
     override fun createFragment(position: Int): Fragment {
         if(position == 1)
-            return OrginisedEvents()
+            return orginisedEvents
         else
-            return FollowedEvents()
+            return followedEvents
     }
 }

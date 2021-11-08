@@ -1,6 +1,7 @@
 package com.example.eventa.viewModels
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +18,7 @@ class allEventsViewModel : ViewModel() {
 
     private val events = MutableLiveData<MutableList<Event>>()
     enum class Types {ADDED, MODIFIED, REMOVED, CLEARED}
-    lateinit var change: Types
+    var change = Types.CLEARED
     var pos: Int = -1
 
     init{
@@ -32,7 +33,7 @@ class allEventsViewModel : ViewModel() {
         if(email != "" && city != "" && age != -1) {
             change = Types.CLEARED
             events.value = mutableListOf()
-            DBHelper.loadAvalEvents(User.email, city, age, ::onAllEventsResult)
+            DBHelper.loadAvalEvents(email, city, age, ::onAllEventsResult)
         }
         else
             Log.d("allEventsViewModel", "No input data, cant load all events")

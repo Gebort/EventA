@@ -12,7 +12,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.eventa.Event
 import com.example.eventa.R
 import com.example.eventa.User
 import com.example.eventa.recyclerViews.allEventsAdapter
@@ -45,6 +44,7 @@ class AllEvents : Fragment() {
         prBar.visibility = View.INVISIBLE
 
         layoutEmpty = i.findViewById(R.id.layoutEmpty)
+        layoutEmpty.visibility = View.GONE
 
         v = inflater.inflate(R.layout.spinner_city, null)
 
@@ -59,14 +59,14 @@ class AllEvents : Fragment() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                updateData(data[position], User.age)
+                updateData(data[position])
             }
 
         }
 
         swipeR = i.findViewById(R.id.swiperefresh)
         swipeR.setOnRefreshListener {
-            updateData(data[spinner.selectedItemPosition], User.age)
+            updateData(data[spinner.selectedItemPosition])
             swipeR.isRefreshing = false
         }
 
@@ -77,7 +77,6 @@ class AllEvents : Fragment() {
         if(adapter == null){
             adapter = allEventsAdapter(model.getEvents().value!!)
             rView.adapter = adapter
-            adapter!!.notifyDataSetChanged()
         }
         activity?.let {
             model.getEvents().observe(it, { events ->
@@ -85,8 +84,8 @@ class AllEvents : Fragment() {
                 onEventsResult(model.change, model.pos, model.getEvents().value!!.size)
             })
         }
-        if (model.city != User.city){
-            updateData(data[0], User.age)
+        if (model.city != data[spinner.selectedItemPosition] || model.email != User.email || model.age != User.age){
+            updateData(data[0])
         }
 
         return i
@@ -107,12 +106,12 @@ class AllEvents : Fragment() {
         actionBar?.setDisplayShowCustomEnabled(true)
     }
 
-    fun updateData(city: String, age: Int){
+    fun updateData(city: String){
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
         val model: allEventsViewModel by activityViewModels()
         model.city = city
-        model.age = age
+        model.age = User.age
         model.email = User.email
         model.loadAllEvents()
     }
@@ -120,7 +119,7 @@ class AllEvents : Fragment() {
     fun onEventsResult(type: allEventsViewModel.Types, pos: Int, size: Int) {
         prBar.visibility = View.INVISIBLE
         prBar.isEnabled = false
-        if (size == 0)
+        if (adapter!!.events.isEmpty())
             layoutEmpty.visibility = View.VISIBLE
         else {
             layoutEmpty.visibility = View.GONE
@@ -140,21 +139,5 @@ class AllEvents : Fragment() {
                 adapter!!.notifyDataSetChanged()
             }
         }
-//        if (result) {
-//            if(eventsNew != null)
-//                events.clear()
-//                events.addAll(eventsNew!!)
-//                if(events.size == 0){
-//                    layoutEmpty.visibility = View.VISIBLE
-//                }
-//                else{
-//                    layoutEmpty.visibility = View.GONE
-//                }
-//            if(adapter == null){
-//                adapter = allEventsAdapter(events!!)
-//                rView.adapter = adapter
-//            }
-//            adapter!!.notifyDataSetChanged()
-//        }
     }
 }

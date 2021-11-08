@@ -19,8 +19,5 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav_menu)
         val navController = findNavController(R.id.navigation_fragment)
         bottomNavigationView.setupWithNavController(navController)
-
-        //val model: allEventsViewModel by viewModels()
-
     }
 }

@@ -12,7 +12,7 @@ import com.example.eventa.R
 import java.text.SimpleDateFormat
 import java.util.*
 
-class orgEventsAdapter(private val events: List<Event>):
+class orgEventsAdapter(var events: MutableList<Event>):
         RecyclerView.Adapter<orgEventsAdapter.MyViewHolder>(){
 
     private var mExpandedPosition = -1

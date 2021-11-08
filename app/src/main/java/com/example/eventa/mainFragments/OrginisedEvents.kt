@@ -15,7 +15,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.eventa.Event
 import com.example.eventa.R
 import com.example.eventa.User
+import com.example.eventa.recyclerViews.followedEventsAdapter
 import com.example.eventa.recyclerViews.orgEventsAdapter
+import com.example.eventa.viewModels.followedEventsViewModel
 import com.example.eventa.viewModels.orgEventsViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -26,7 +28,6 @@ class OrginisedEvents : Fragment() {
     private lateinit var rView: RecyclerView
     private lateinit var layoutEmpty: ConstraintLayout
     private var adapter: orgEventsAdapter? = null
-    private var events = mutableListOf<Event>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,13 +58,19 @@ class OrginisedEvents : Fragment() {
         }
 
         val model: orgEventsViewModel by activityViewModels()
-        if (model.email != User.email){
-            updateData()
+        if(adapter == null){
+            adapter = orgEventsAdapter(model.getEvents().value!!)
+            rView.adapter = adapter
         }
         activity?.let {
-            model.getEvents().observe(it , { events ->
-                onEventsResult(true, events)
+            model.getEvents().observe(it, { events ->
+                adapter!!.events = events
+                onEventsResult(model.change, model.pos)
             })
+        }
+
+        if (model.email != User.email){
+            updateData()
         }
 
         return i
@@ -77,22 +84,28 @@ class OrginisedEvents : Fragment() {
         model.loadOrgEvents()
     }
 
-    fun onEventsResult(result: Boolean, eventsNew: List<Event>?) {
+    fun onEventsResult(type: orgEventsViewModel.Types, pos: Int) {
         prBar.visibility = View.INVISIBLE
         prBar.isEnabled = false
-        if (result) {
-            if(eventsNew != null)
-                events.clear()
-                events.addAll(eventsNew!!)
-                if(events.size == 0)
-                    layoutEmpty.visibility = View.VISIBLE
-                else
-                    layoutEmpty.visibility = View.GONE
-            if(adapter == null){
-                adapter = orgEventsAdapter(events!!)
-                rView.adapter = adapter
+        if (adapter!!.events.isEmpty())
+            layoutEmpty.visibility = View.VISIBLE
+        else {
+            layoutEmpty.visibility = View.GONE
+        }
+
+        when (type) {
+            orgEventsViewModel.Types.ADDED -> {
+                adapter!!.notifyItemInserted(pos)
             }
-            adapter!!.notifyDataSetChanged()
+            orgEventsViewModel.Types.MODIFIED -> {
+                adapter!!.notifyItemChanged(pos)
+            }
+            orgEventsViewModel.Types.REMOVED -> {
+                adapter!!.notifyItemRemoved(pos)
+            }
+            orgEventsViewModel.Types.CLEARED -> {
+                adapter!!.notifyDataSetChanged()
+            }
         }
     }
 
