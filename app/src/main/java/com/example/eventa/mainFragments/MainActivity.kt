@@ -1,8 +1,12 @@
 package com.example.eventa.mainFragments
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.eventa.R
@@ -19,5 +23,14 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav_menu)
         val navController = findNavController(R.id.navigation_fragment)
         bottomNavigationView.setupWithNavController(navController)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.all_events_icon, menu)
+        val search = menu.findItem(R.id.action_search)
+        val searchView = SearchView(this)
+        search.actionView = searchView
+        search.expandActionView()
+        return super.onCreateOptionsMenu(menu)
     }
 }

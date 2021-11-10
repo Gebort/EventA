@@ -1,11 +1,10 @@
 package com.example.eventa.mainFragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,7 +19,6 @@ import com.example.eventa.viewModels.allEventsViewModel
 
 class AllEvents : Fragment() {
     //TODO добавить поиск по названию/ID события
-    //TODO краш при ручном обновлении списка
     private lateinit var spinner: Spinner
     private lateinit var prBar: ProgressBar
     private lateinit var swipeR: SwipeRefreshLayout
@@ -33,6 +31,7 @@ class AllEvents : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
+        setHasOptionsMenu(true)
         val i = inflater.inflate(R.layout.fragment_all_events, container, false)
 
         activity?.title = ""
@@ -75,12 +74,13 @@ class AllEvents : Fragment() {
 
         val model: allEventsViewModel by activityViewModels()
         if(adapter == null){
-            adapter = allEventsAdapter(model.getEvents().value!!)
+            adapter = allEventsAdapter(rView, model.eventMin, model.getEvents().value!!.toMutableList(), ::onScrollEnd)
             rView.adapter = adapter
         }
         activity?.let {
             model.getEvents().observe(it, { events ->
-                adapter!!.events = events
+                val b = adapter!!.events.size
+                adapter!!.events = events.toMutableList()
                 onEventsResult(model.change, model.pos, model.getEvents().value!!.size)
             })
         }
@@ -104,36 +104,100 @@ class AllEvents : Fragment() {
         val actionBar = act.supportActionBar
         actionBar?.customView = v
         actionBar?.setDisplayShowCustomEnabled(true)
+        if (adapter!!.events.size < adapter!!.visibleThreshold){
+            onScrollEnd()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        val search = menu.findItem(R.id.action_search)
+        val searchView = search.actionView as SearchView?
+        searchView?.queryHint = "Search by title or id..."
+        searchView?.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+
+                return true
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            R.id.action_search -> {
+
+            }
+            R.id.action_more -> {
+
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 
     fun updateData(city: String){
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
+        adapter!!.setLoaded()
         val model: allEventsViewModel by activityViewModels()
         model.city = city
         model.age = User.age
         model.email = User.email
-        model.loadAllEvents()
+        model.eventCount = model.eventMin
+        model.loadAllEvents(true)
+    }
+
+    fun onScrollEnd(){
+        if (!adapter!!.isLoading) {
+            adapter!!.isLoading = true
+            adapter!!.events.add(null)
+            adapter!!.notifyItemInserted(adapter!!.events.size - 1)
+            val model: allEventsViewModel by activityViewModels()
+            model.eventCount += model.eventIncrement
+            model.loadAllEvents(false)
+        }
     }
 
     fun onEventsResult(type: allEventsViewModel.Types, pos: Int, size: Int) {
         prBar.visibility = View.INVISIBLE
         prBar.isEnabled = false
-        if (adapter!!.events.isEmpty())
+
+        if (adapter!!.events.isEmpty()){
             layoutEmpty.visibility = View.VISIBLE
+        }
         else {
             layoutEmpty.visibility = View.GONE
         }
 
+        if (adapter!!.isLoading) {
+            if (type == allEventsViewModel.Types.MODIFIED || type == allEventsViewModel.Types.REMOVED) {
+                adapter!!.events.add(null)
+            }
+        }
+
         when (type) {
             allEventsViewModel.Types.ADDED -> {
-                adapter!!.notifyItemInserted(pos)
+                if (adapter!!.isLoading){
+                    adapter!!.setLoaded()
+                    adapter!!.notifyItemChanged(pos)
+                }
+                else {
+                    adapter!!.notifyItemInserted(pos)
+                }
             }
             allEventsViewModel.Types.MODIFIED -> {
                 adapter!!.notifyItemChanged(pos)
             }
             allEventsViewModel.Types.REMOVED -> {
                 adapter!!.notifyItemRemoved(pos)
+                if (adapter!!.events.size == 0){
+                    onScrollEnd()
+                }
             }
             allEventsViewModel.Types.CLEARED -> {
                 adapter!!.notifyDataSetChanged()

@@ -65,7 +65,6 @@ class followedEventsAdapter(var events: List<Event>):
         h.time?.text = "${events[i].hour}:${events[i].min}"
         h.orgName?.text = "Organisator - ${events[i].orgName}"
         h.title?.text = events[i].title
-        //TODO Если событие не исчезло из списка, то при апдейте списка кнопка снова станет активной
         h.unsign?.isEnabled = true
         if(events[i].showEmail){
             h.orgEmail?.text = "Email - ${events[i].orgEmail}"
@@ -73,15 +72,15 @@ class followedEventsAdapter(var events: List<Event>):
         }
         else{
             h.orgEmail?.text = ""
-            h.orgEmail?.visibility = View.INVISIBLE
+            h.orgEmail?.visibility = View.GONE
         }
-        if(events[i].showPhone){
+        if(events[i].showNumber){
             h.orgPhone?.text = "Phone - ${events[i].orgPhone}"
             h.orgPhone?.visibility = View.VISIBLE
         }
         else{
             h.orgPhone?.text = ""
-            h.orgPhone?.visibility = View.INVISIBLE
+            h.orgPhone?.visibility = View.GONE
         }
 
         h.extraLayout?.visibility = View.GONE

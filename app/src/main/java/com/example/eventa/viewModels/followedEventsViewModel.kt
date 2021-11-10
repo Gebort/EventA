@@ -41,8 +41,13 @@ class followedEventsViewModel : ViewModel() {
 
         when (change) {
             Types.ADDED -> {
-                events.value!!.add(event)
-                events.value = events.value!!.sortedBy { it.date }.toMutableList()
+                if (pos >= events.value!!.size) {
+                    events.value!!.add(event)
+                }
+                else{
+                    events.value!!.add(pos, event)
+                }
+                events.value = events.value
             }
             Types.MODIFIED -> {
                 events.value!![pos] = event

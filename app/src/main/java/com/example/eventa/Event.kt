@@ -14,7 +14,7 @@ data class Event(
         var loc: String? = null,
         var public: Boolean = false,
         var showEmail: Boolean = false,
-        var showPhone: Boolean = false,
+        var showNumber: Boolean = false,
         var orgName: String? = "",
         var orgPhone: String? = "",
         var orgEmail: String? = "",

@@ -16,6 +16,11 @@ class allEventsViewModel : ViewModel() {
     var city = ""
     var age = -1
 
+    var eventIncrement = 5
+    var eventMin = 15
+    var eventCount = eventMin
+
+
     private val events = MutableLiveData<MutableList<Event>>()
     enum class Types {ADDED, MODIFIED, REMOVED, CLEARED}
     var change = Types.CLEARED
@@ -29,11 +34,13 @@ class allEventsViewModel : ViewModel() {
         return events
     }
 
-    fun loadAllEvents() {
+    fun loadAllEvents(clear: Boolean) {
         if(email != "" && city != "" && age != -1) {
-            change = Types.CLEARED
-            events.value = mutableListOf()
-            DBHelper.loadAvalEvents(email, city, age, ::onAllEventsResult)
+            if (clear) {
+                change = Types.CLEARED
+                events.value = mutableListOf()
+            }
+            DBHelper.loadAvalEvents(email, city, age, eventCount.toLong(), ::onAllEventsResult)
         }
         else
             Log.d("allEventsViewModel", "No input data, cant load all events")
@@ -49,7 +56,8 @@ class allEventsViewModel : ViewModel() {
             }
             else{
                 if ((event.users != null && event.users!!.contains(email)) ||
-                        event.currPartNumber >= event.partNumber) {
+                        event.currPartNumber >= event.partNumber ||
+                        event.minAge > age) {
                     change = Types.REMOVED
                 }
                 else{
@@ -62,8 +70,10 @@ class allEventsViewModel : ViewModel() {
             Types.ADDED -> {
                 if(e == null) {
                     if (event.orgEmail!! != email && (event.users == null || !event.users!!.contains(email)) &&
-                            event.currPartNumber < event.partNumber) {
+                            event.currPartNumber < event.partNumber &&
+                            event.minAge <= age) {
                         events.value!!.add(event)
+                        //TODO нужно сортировать еще по часу и минутам. Возможен рассинхрон с сервером
                         val newEvents = events.value!!.sortedBy { it.date }.toMutableList()
                         pos = newEvents.indexOf(event)
                         events.value = newEvents

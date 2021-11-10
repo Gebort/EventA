@@ -81,6 +81,7 @@ class OrgEvents : Fragment() {
 
         locInput.isEnabled = loc
         cityText.isEnabled = loc
+        createBut.isEnabled = true
 
         locSwitch.setOnClickListener{
             loc = !loc
@@ -97,7 +98,7 @@ class OrgEvents : Fragment() {
         }
 
         dateBut.setOnClickListener {
-
+            //TODO ограничение по времени
             val picker =
                     MaterialDatePicker.Builder.datePicker()
                             .setTitleText("Select your event date")
@@ -142,6 +143,7 @@ class OrgEvents : Fragment() {
 
         createBut.setOnClickListener {
             //TODO добавить обработку ввода
+            createBut.isEnabled = false
 
             var city: String? = null
             if(loc)

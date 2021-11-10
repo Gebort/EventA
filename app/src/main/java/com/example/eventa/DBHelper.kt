@@ -126,13 +126,13 @@ object DBHelper {
 
     }
 
-    fun loadAvalEvents(email: String, city: String, age: Int, callback: (Event, allEventsViewModel.Types) -> Unit) {
+    fun loadAvalEvents(email: String, city: String, age: Int, count: Long, callback: (Event, allEventsViewModel.Types) -> Unit) {
         val db = Firebase.firestore
 
         avalEventsListener?.remove()
 
         //TODO проверка на дату и время события
-        avalEventsListener = db.collection("cities").document(city.toLowerCase(Locale.ROOT)).collection("events").whereLessThanOrEqualTo("minAge", age)
+        avalEventsListener = db.collection("cities").document(city.toLowerCase(Locale.ROOT)).collection("events").orderBy("date").orderBy("hour").orderBy("min").limit(count)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load aval events: $error")
@@ -140,21 +140,21 @@ object DBHelper {
                         if (value != null) {
                             for (doc in value.documentChanges) {
                                 val event = doc.document.toObject(Event::class.java)
-                                event.id = doc.document.id
-                                event.city = User.city.toLowerCase(Locale.ROOT)
-                                if (event.users == null) {
-                                    event.users = listOf()
-                                }
-                                when (doc.type) {
-                                    DocumentChange.Type.ADDED -> {
-                                        callback(event, allEventsViewModel.Types.ADDED)
+                                    event.id = doc.document.id
+                                    event.city = User.city.toLowerCase(Locale.ROOT)
+                                    if (event.users == null) {
+                                        event.users = listOf()
                                     }
-                                    DocumentChange.Type.MODIFIED -> {
-                                        callback(event, allEventsViewModel.Types.MODIFIED)
-                                    }
-                                    DocumentChange.Type.REMOVED -> {
-                                        callback(event, allEventsViewModel.Types.REMOVED)
-                                    }
+                                    when (doc.type) {
+                                        DocumentChange.Type.ADDED -> {
+                                            callback(event, allEventsViewModel.Types.ADDED)
+                                        }
+                                        DocumentChange.Type.MODIFIED -> {
+                                            callback(event, allEventsViewModel.Types.MODIFIED)
+                                        }
+                                        DocumentChange.Type.REMOVED -> {
+                                            callback(event, allEventsViewModel.Types.REMOVED)
+                                        }
                                 }
                             }
                         }
@@ -168,7 +168,7 @@ object DBHelper {
 
         orgEventsListener?.remove()
 
-        orgEventsListener = db.collection("cities").document(User.city.toLowerCase(Locale.ROOT)).collection("events").whereEqualTo("orgEmail", email)
+        orgEventsListener = db.collection("cities").document(User.city.toLowerCase(Locale.ROOT)).collection("events").whereEqualTo("orgEmail", email).orderBy("date").orderBy("hour").orderBy("min")
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load organised events: $error")
@@ -219,7 +219,7 @@ object DBHelper {
 
         followedEventsListener?.remove()
 
-        followedEventsListener = db.collection("cities").document(User.city.toLowerCase()).collection("events").whereArrayContains("users", email)
+        followedEventsListener = db.collection("cities").document(User.city.toLowerCase()).collection("events").whereArrayContains("users", email).orderBy("date").orderBy("hour").orderBy("min")
                 .addSnapshotListener { value, error ->
                     if (error != null){
                         Log.d("DBHelper", "Failed to load followed events: $error")

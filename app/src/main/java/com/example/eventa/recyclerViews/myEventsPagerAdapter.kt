@@ -11,6 +11,10 @@ class myEventsPagerAdapter(fa: FragmentActivity) : FragmentStateAdapter(fa){
     val orginisedEvents = OrginisedEvents()
     val followedEvents = FollowedEvents()
 
+    init{
+
+    }
+
     override fun getItemCount(): Int {
         return 2
     }

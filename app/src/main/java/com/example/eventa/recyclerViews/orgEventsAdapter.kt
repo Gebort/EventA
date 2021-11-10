@@ -65,6 +65,7 @@ class orgEventsAdapter(var events: MutableList<Event>):
         h.time?.text = "${events[i].hour}:${events[i].min}"
         h.orgName?.text = "Organisator - ${events[i].orgName}"
         h.title?.text = events[i].title
+
         if(events[i].showEmail){
             h.orgEmail?.text = "Email - ${events[i].orgEmail}"
             h.orgEmail?.visibility = View.VISIBLE
@@ -73,7 +74,7 @@ class orgEventsAdapter(var events: MutableList<Event>):
             h.orgEmail?.text = ""
             h.orgEmail?.visibility = View.INVISIBLE
         }
-        if(events[i].showPhone){
+        if(events[i].showNumber){
             h.orgPhone?.text = "Phone - ${events[i].orgPhone}"
             h.orgPhone?.visibility = View.VISIBLE
         }

@@ -31,8 +31,9 @@ class MyEvents : Fragment() {
         viewPager = i.findViewById(R.id.viewPager)
         tabLayout = i.findViewById(R.id.tabLayout)
 
-        val pagerAdapger = activity?.let { myEventsPagerAdapter(it)}
-        viewPager.adapter = pagerAdapger
+        val pagerAdapder = activity?.let { myEventsPagerAdapter(it)}
+        viewPager.adapter = pagerAdapder
+        viewPager.offscreenPageLimit = 1
 
         TabLayoutMediator(tabLayout, viewPager){tab, position ->
             when(position){
