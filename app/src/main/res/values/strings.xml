@@ -2,7 +2,7 @@
     <string name="app_name">EventA</string>
     <string name="no_place">No physical place</string>
     <string name="no_city">None</string>
-    <string name="warning_invalid_login">Invalid login or password</string>
+    <string name="warning_invalid_login">Invalid</string>
     <string name="warning_google_signin_failed">Unable to login</string>
     <string name="warning_failed_to_change_data">Failed to change data</string>
     <string name="warning_verificate_account">Please verificate account\nLetter sent to your email</string>
@@ -23,5 +23,5 @@
     <string name="event_deleted">Event was deleted</string>
     <string name="event_not_deleted">Failed to delete the event</string>
     <string name="event_delete_confirm">Do you want to delete the event -\n"%1$s"?</string>
-
+    <string name="google_auth_text">Or use google account</string>
 </resources>

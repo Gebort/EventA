@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -30,6 +31,8 @@ class LoginFragment : Fragment() {
     private lateinit var regBut: Button
     private lateinit var emailInput: EditText
     private lateinit var passwordInput: EditText
+    private lateinit var emailLayout: TextInputLayout
+    private lateinit var passwordLayout: TextInputLayout
     private lateinit var progressBar: ProgressBar
     private lateinit var warningText: TextView
     private lateinit var sendVerifyText: TextView
@@ -53,6 +56,8 @@ class LoginFragment : Fragment() {
         regBut = inflate.findViewById(R.id.regBut)
         emailInput = inflate.findViewById(R.id.emailInput)
         passwordInput = inflate.findViewById(R.id.passwordInput)
+        emailLayout = inflate.findViewById(R.id.loginLayout)
+        passwordLayout = inflate.findViewById(R.id.passwordLayout)
         progressBar = inflate.findViewById(R.id.progressBar)
         warningText = inflate.findViewById(R.id.warningText)
         sendVerifyText = inflate.findViewById(R.id.butSendAgain)
@@ -129,6 +134,8 @@ class LoginFragment : Fragment() {
                 if(task.isSuccessful) {
                     val currentUser = auth.currentUser
                     if (currentUser != null) {
+                        emailLayout.error = null
+                        passwordLayout.error = null
                         if (currentUser.isEmailVerified) {
                             email = currentUser.email
                             warningText.visibility = View.GONE
@@ -149,8 +156,8 @@ class LoginFragment : Fragment() {
                 else{
                     val error = task.exception
                     loadingBar(false)
-                    warningText.text = getText(R.string.warning_invalid_login)
-                    warningText.visibility = View.VISIBLE
+                    emailLayout.error = getText(R.string.warning_invalid_login)
+                    passwordLayout.error = getText(R.string.warning_invalid_login)
                 }
             }
 

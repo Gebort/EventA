@@ -16,10 +16,11 @@ class allEventsViewModel : ViewModel() {
     var city = ""
     var age = -1
 
-    var eventIncrement = 10
+    var eventIncrement = 5
     var eventMin = 20
     var eventCount = eventMin
-    var updateDelay = 10000L
+    var updateDelay = 2000L
+    var isDelayLoading = false
 
 
     private val events = MutableLiveData<MutableList<Event>>()
@@ -35,7 +36,6 @@ class allEventsViewModel : ViewModel() {
         return events
     }
 
-    @DelicateCoroutinesApi
     fun loadAllEvents(clear: Boolean) {
         if(email != "" && city != "" && age != -1) {
             if (clear) {
@@ -44,16 +44,13 @@ class allEventsViewModel : ViewModel() {
             }
             DBHelper.loadAvalEvents(email, city, age, eventCount.toLong(), ::onAllEventsResult)
 
-            //TODO не изученно влияет на взаимодействие с событиями. Слишком частая проверка ломает логику
-            GlobalScope.launch {
-                delay(updateDelay)
-                delayUpdateCheck()
-            }
+            delayUpdateCheck()
         }
         else
             Log.d("allEventsViewModel", "No input data, cant load all events")
     }
 
+    @DelicateCoroutinesApi
     private fun onAllEventsResult(event: Event, type: Types){
         val e = events.value!!.firstOrNull { it.id == event.id }
         change = type
@@ -81,7 +78,7 @@ class allEventsViewModel : ViewModel() {
                             event.currPartNumber < event.partNumber &&
                             event.minAge <= age) {
                         events.value!!.add(event)
-                        val newEvents = ((events.value!!.sortedBy { it.date }).sortedBy { it.hour }).sortedBy { it.min }.toMutableList()
+                        val newEvents = events.value!!.sortedBy { it.date }.toMutableList()
                         pos = newEvents.indexOf(event)
                         events.value = newEvents
                     }
@@ -100,13 +97,25 @@ class allEventsViewModel : ViewModel() {
                 }
             }
         }
+
+        delayUpdateCheck()
+
     }
 
+    @DelicateCoroutinesApi
     private fun delayUpdateCheck(){
-        if (events.value!!.size < eventMin) {
-            eventCount += eventIncrement
-            loadAllEvents(false)
+        if (!isDelayLoading && events.value!!.size < eventMin) {
+            GlobalScope.launch {
+                isDelayLoading = true
+                delay(updateDelay)
+                if (events.value != null)
+                    if (events.value!!.size < eventMin) {
+                        eventCount += eventIncrement
+                        loadAllEvents(false)
+                    }
+                isDelayLoading = false
+            }
         }
-    }
+        }
 
 }
