@@ -20,5 +20,8 @@
     <string name="organised">Organised</string>
     <string name="followed">Followed</string>
     <string name="empty_list">No events to show you</string>
+    <string name="event_deleted">Event was deleted</string>
+    <string name="event_not_deleted">Failed to delete the event</string>
+    <string name="event_delete_confirm">Do you want to delete the event -\n"%1$s"?</string>
 
 </resources>

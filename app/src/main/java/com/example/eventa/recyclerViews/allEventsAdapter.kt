@@ -101,22 +101,22 @@ class allEventsAdapter(val rView: RecyclerView, var visibleThreshold: Int, var e
                 h.extraLayout?.visibility = View.GONE
                 h.signup?.isEnabled = true
 
-                val isExpanded = i == mExpandedPosition
+                val isExpanded = h.layoutPosition == mExpandedPosition
                 h.extraLayout?.visibility = if (isExpanded) View.VISIBLE else View.GONE
                 h.itemView.isActivated = isExpanded
 
-                if (isExpanded) previousExpandedPosition = i
+                if (isExpanded) previousExpandedPosition = mExpandedPosition
 
                 h.itemView.setOnClickListener {
-                    //TODO при удалении события из списка, остается выделение уже удаленного события
-                    mExpandedPosition = if (isExpanded) -1 else i
+                    mExpandedPosition = if (isExpanded) -1 else h.layoutPosition
                     notifyItemChanged(previousExpandedPosition)
-                    notifyItemChanged(i)
+                    notifyItemChanged(mExpandedPosition)
                 }
 
                 h.signup?.setOnClickListener {
                     h.signup?.isEnabled = false
-                    previousExpandedPosition = mExpandedPosition
+                    previousExpandedPosition = -1
+                    mExpandedPosition = -1
                     DBHelper.addParticipant(events[i]!!.id!!, events[i]!!.city!!, User.email, ::onAddResult)
                 }
             }

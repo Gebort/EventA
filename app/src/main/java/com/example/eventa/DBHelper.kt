@@ -126,6 +126,20 @@ object DBHelper {
 
     }
 
+    fun deleteEvent(id: String, city: String, callback: (Boolean) -> Unit){
+        val db = Firebase.firestore
+
+        db.collection("cities").document(city.toLowerCase(Locale.ROOT)).collection("events").document(id).delete()
+            .addOnSuccessListener {
+                callback(true)
+            }
+            .addOnFailureListener { e ->
+                Log.d("DBHelper", "Failed to delete $id, error: $e")
+                callback(false)
+            }
+
+    }
+
     fun loadAvalEvents(email: String, city: String, age: Int, count: Long, callback: (Event, allEventsViewModel.Types) -> Unit) {
         val db = Firebase.firestore
 

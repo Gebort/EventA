@@ -85,21 +85,22 @@ class followedEventsAdapter(var events: List<Event>):
 
         h.extraLayout?.visibility = View.GONE
 
-        val isExpanded = i == mExpandedPosition
+        val isExpanded = h.layoutPosition == mExpandedPosition
         h.extraLayout?.visibility = if (isExpanded) View.VISIBLE else View.GONE
         h.itemView.isActivated = isExpanded
 
-        if (isExpanded) previousExpandedPosition = i
+        if (isExpanded) previousExpandedPosition = mExpandedPosition
 
         h.itemView.setOnClickListener{
-            mExpandedPosition = if (isExpanded) -1 else i
+            mExpandedPosition = if (isExpanded) -1 else h.layoutPosition
             notifyItemChanged(previousExpandedPosition)
-            notifyItemChanged(i)
+            notifyItemChanged(mExpandedPosition)
         }
 
         h.unsign?.setOnClickListener {
             h.unsign?.isEnabled = false
             mExpandedPosition = -1
+            previousExpandedPosition = -1
             DBHelper.removeParticipant(events[i].id!!, events[i].city!!, User.email, ::onRemoveResult)
         }
 

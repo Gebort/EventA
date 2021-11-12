@@ -62,7 +62,7 @@ class OrginisedEvents : Fragment() {
         model = modelN
 
         if(adapter == null){
-            adapter = orgEventsAdapter(model.getEvents().value!!)
+            adapter = orgEventsAdapter(model.getEvents().value!!, rView)
             rView.adapter = adapter
         }
         activity?.let {
@@ -103,6 +103,8 @@ class OrginisedEvents : Fragment() {
                 adapter!!.notifyItemChanged(pos)
             }
             orgEventsViewModel.Types.REMOVED -> {
+                adapter!!.previousExpandedPosition = adapter!!.noSelected
+                adapter!!.mExpandedPosition = adapter!!.noSelected
                 adapter!!.notifyItemRemoved(pos)
             }
             orgEventsViewModel.Types.CLEARED -> {

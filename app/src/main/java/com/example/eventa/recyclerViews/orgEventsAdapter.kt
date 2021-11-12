@@ -7,16 +7,20 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.example.eventa.DBHelper
 import com.example.eventa.Event
 import com.example.eventa.R
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 
-class orgEventsAdapter(var events: MutableList<Event>):
+class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
         RecyclerView.Adapter<orgEventsAdapter.MyViewHolder>(){
 
-    private var mExpandedPosition = -1
-    private var previousExpandedPosition = -1
+    var noSelected = -1
+    var mExpandedPosition = noSelected
+    var previousExpandedPosition = noSelected
 
     class MyViewHolder(iv: View) : RecyclerView.ViewHolder(iv){
         var title: TextView?
@@ -85,16 +89,16 @@ class orgEventsAdapter(var events: MutableList<Event>):
 
         h.extraLayout?.visibility = View.GONE
 
-        val isExpanded = i == mExpandedPosition
+        val isExpanded = h.layoutPosition == mExpandedPosition
         h.extraLayout?.visibility = if (isExpanded) View.VISIBLE else View.GONE
         h.itemView.isActivated = isExpanded
 
-        if (isExpanded) previousExpandedPosition = i
+        if (isExpanded) previousExpandedPosition = mExpandedPosition
 
         h.itemView.setOnClickListener{
-            mExpandedPosition = if (isExpanded) -1 else i
+            mExpandedPosition = if (isExpanded) noSelected else h.layoutPosition
             notifyItemChanged(previousExpandedPosition)
-            notifyItemChanged(i)
+            notifyItemChanged(mExpandedPosition)
         }
 
         //TODO возможность просмотреть список участников и информацию о них
@@ -106,7 +110,20 @@ class orgEventsAdapter(var events: MutableList<Event>):
 
         h.delete?.setOnClickListener {
             h.delete?.isEnabled = false
-            //TODO возможность удалять события
+
+
+            MaterialAlertDialogBuilder(rView.context)
+                .setMessage(String.format(rView.context.resources.getString(R.string.event_delete_confirm), events[i].title))
+                .setNegativeButton("Cancel"){ dialog, _ ->
+                    dialog.cancel()
+                }
+                .setPositiveButton("Yes"){ _, _ ->
+                    DBHelper.deleteEvent(events[i].id.toString(), events[i].city.toString(), ::onDeleteResult)
+                }
+                .setOnCancelListener{
+                    h.delete?.isEnabled = true
+                }
+                .show()
         }
 
     }
@@ -115,8 +132,15 @@ class orgEventsAdapter(var events: MutableList<Event>):
         return events.size
     }
 
-    fun onAddResult(result: Boolean){
-
+    private fun onDeleteResult(result: Boolean){
+        if (result) {
+            Snackbar.make(rView, R.string.event_deleted, Snackbar.LENGTH_SHORT).setAnchorView(rView)
+                .show()
+        }
+        else{
+            Snackbar.make(rView, R.string.event_not_deleted, Snackbar.LENGTH_SHORT)
+                .show()
+        }
     }
 
 }
