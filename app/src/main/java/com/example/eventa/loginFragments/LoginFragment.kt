@@ -17,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -35,7 +36,7 @@ class LoginFragment : Fragment() {
     private lateinit var passwordLayout: TextInputLayout
     private lateinit var progressBar: ProgressBar
     private lateinit var warningText: TextView
-    private lateinit var sendVerifyText: TextView
+    private lateinit var sendVerifyBut: Button
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
@@ -60,10 +61,10 @@ class LoginFragment : Fragment() {
         passwordLayout = inflate.findViewById(R.id.passwordLayout)
         progressBar = inflate.findViewById(R.id.progressBar)
         warningText = inflate.findViewById(R.id.warningText)
-        sendVerifyText = inflate.findViewById(R.id.butSendAgain)
+        sendVerifyBut = inflate.findViewById(R.id.butSendAgain)
 
         warningText.visibility = View.GONE
-        sendVerifyText.visibility = View.GONE
+        sendVerifyBut.visibility = View.GONE
         loadingBar(false)
 
         val gso = GoogleSignInOptions
@@ -95,16 +96,16 @@ class LoginFragment : Fragment() {
                 loadingBar(true)
                 updateUI(currentUser)
                 email = currentUser.email
-                email?.let { DBHelper.emailCheck(it, ::onEmailCheckResult) }
+                email?.let { DBHelper.emailCheck(it, ::onEmailCheckResultAuto) }
             }
             else {
                 loadingBar(true)
                 warningText.visibility = View.VISIBLE
                 warningText.text = getString(R.string.warning_verificate_account)
-                sendVerifyText.visibility = View.VISIBLE
-                sendVerifyText.setOnClickListener{
-                    sendVerifyText.setTextColor(ContextCompat.getColor(inflate.context, R.color.purple_200))
+                sendVerifyBut.visibility = View.VISIBLE
+                sendVerifyBut.setOnClickListener{
                     currentUser.sendEmailVerification()
+                    Snackbar.make(loginBut, R.string.verification_letter_resend, Snackbar.LENGTH_SHORT).show()
 
                 }
             }
@@ -144,10 +145,10 @@ class LoginFragment : Fragment() {
                         else{
                             warningText.visibility = View.VISIBLE
                             warningText.text = getString(R.string.warning_verificate_account)
-                            sendVerifyText.visibility = View.VISIBLE
-                            sendVerifyText.setOnClickListener{
-                                sendVerifyText.setTextColor(ContextCompat.getColor(inflate.context, R.color.purple_500))
+                            sendVerifyBut.visibility = View.VISIBLE
+                            sendVerifyBut.setOnClickListener{
                                 currentUser.sendEmailVerification()
+                                Snackbar.make(loginBut, R.string.verification_letter_resend, Snackbar.LENGTH_SHORT).show()
 
                             }
                         }
@@ -202,7 +203,11 @@ class LoginFragment : Fragment() {
     private fun updateUI(user: FirebaseUser?){
         if(user != null) {
             emailInput.setText(user.displayName)
-            passwordInput.visibility = View.INVISIBLE
+            passwordLayout.visibility = View.INVISIBLE
+        }
+        else{
+            emailInput.setText("")
+            passwordLayout.visibility = View.VISIBLE
         }
     }
 
@@ -234,7 +239,7 @@ class LoginFragment : Fragment() {
                     if (task.isSuccessful) {
                         Log.d(dTAG, "signInWithCredential:success")
                         warningText.visibility = View.GONE
-                        sendVerifyText.visibility = View.GONE
+                        sendVerifyBut.visibility = View.GONE
                         email = auth.currentUser?.email
                         if (email != null) {
                             DBHelper.emailCheck(email!!, ::onEmailCheckResult)
@@ -257,6 +262,17 @@ class LoginFragment : Fragment() {
         }
         else{
             email?.let { toRegFragment(email, false) }
+        }
+    }
+
+    private fun onEmailCheckResultAuto(result: Boolean){
+        if(result){
+            toMainActivity()
+        }
+        else{
+            Log.w(dTAG, "No data about user")
+            loadingBar(false)
+            updateUI(null)
         }
     }
 }

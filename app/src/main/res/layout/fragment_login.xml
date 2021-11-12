@@ -10,6 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <Button
+            android:id="@+id/butSendAgain"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Send again"
+            app:layout_constraintBottom_toTopOf="@+id/loginLayout"
+            app:layout_constraintEnd_toEndOf="@+id/loginLayout"
+            app:layout_constraintStart_toStartOf="@+id/loginLayout" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/loginLayout"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -125,7 +136,7 @@
             style="@style/Widget.AppCompat.TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="3dp"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
             android:text="Invalid login or password"
@@ -134,18 +145,6 @@
             app:layout_constraintBottom_toTopOf="@+id/butSendAgain"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/butSendAgain"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:clickable="true"
-            android:text="Send again"
-            android:textColor="#2196F3"
-            app:layout_constraintBottom_toTopOf="@+id/loginLayout"
-            app:layout_constraintEnd_toEndOf="@+id/warningText"
-            app:layout_constraintStart_toStartOf="@+id/warningText" />
 
         <View
             android:id="@+id/divider3"
@@ -167,6 +166,16 @@
             app:layout_constraintBottom_toTopOf="@+id/googleBut"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/app_icon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider3" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

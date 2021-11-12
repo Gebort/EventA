@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.eventa.*
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -20,7 +21,7 @@ import com.google.firebase.ktx.Firebase
 class RegistrationFragment : Fragment() {
 
     private lateinit var email: String
-    private var customRegistration: Boolean = true
+    private var googleRegistration: Boolean = true
 
     private lateinit var auth: FirebaseAuth
 
@@ -32,14 +33,16 @@ class RegistrationFragment : Fragment() {
     private lateinit var ageInput: EditText
     private lateinit var cityInput: EditText
     private lateinit var descInput: EditText
-    private lateinit var emailText: TextView
-    private lateinit var nameText: TextView
-    private lateinit var passText: TextView
-    private lateinit var passText2: TextView
-    private lateinit var phoneText: TextView
-    private lateinit var ageText: TextView
-    private lateinit var cityText: TextView
-    private lateinit var descText: TextView
+
+    private lateinit var emailLayout: TextInputLayout
+    private lateinit var nameLayout: TextInputLayout
+    private lateinit var passLayout: TextInputLayout
+    private lateinit var pass2Layout: TextInputLayout
+    private lateinit var phoneLayout: TextInputLayout
+    private lateinit var ageLayout: TextInputLayout
+    private lateinit var cityLayout: TextInputLayout
+    private lateinit var descLayout: TextInputLayout
+
     private lateinit var warningText: TextView
     private lateinit var progressBar: ProgressBar
 
@@ -54,30 +57,30 @@ class RegistrationFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
+
         val inflate = inflater.inflate(R.layout.fragment_registration, container, false)
 
         emailInput = inflate.findViewById(R.id.emailReg)
         nameInput = inflate.findViewById(R.id.nameReg)
         passInput = inflate.findViewById(R.id.passReg)
-        passInput2 = inflate.findViewById(R.id.passReg2)
+        passInput2 = inflate.findViewById(R.id.pass2Reg)
         phoneInput = inflate.findViewById(R.id.phoneReg)
         ageInput = inflate.findViewById(R.id.ageReg)
         descInput = inflate.findViewById(R.id.descReg)
         cityInput = inflate.findViewById(R.id.cityReg)
 
-        emailText = inflate.findViewById(R.id.emailText)
-        nameText = inflate.findViewById(R.id.nameText)
-        passText = inflate.findViewById(R.id.passwordText)
-        passText2 = inflate.findViewById(R.id.passwordText2)
-        phoneText = inflate.findViewById(R.id.phoneText)
-        ageText = inflate.findViewById(R.id.ageText)
-        descText = inflate.findViewById(R.id.descText)
-        cityText = inflate.findViewById(R.id.cityText)
-        warningText = inflate.findViewById(R.id.warningText)
+        emailLayout = inflate.findViewById(R.id.emailLayout)
+        nameLayout = inflate.findViewById(R.id.nameLayout)
+        passLayout = inflate.findViewById(R.id.passLayout)
+        pass2Layout = inflate.findViewById(R.id.pass2Layout)
+        phoneLayout = inflate.findViewById(R.id.phoneLayout)
+        ageLayout = inflate.findViewById(R.id.ageLayout)
+        descLayout = inflate.findViewById(R.id.descLayout)
+        cityLayout = inflate.findViewById(R.id.cityLayout)
 
         regBut = inflate.findViewById(R.id.registerBut)
         progressBar = inflate.findViewById(R.id.progressBar)
+        warningText = inflate.findViewById(R.id.warningText)
 
         auth = Firebase.auth
 
@@ -87,13 +90,11 @@ class RegistrationFragment : Fragment() {
 
         val args: RegistrationFragmentArgs by navArgs()
 
-        customRegistration = !args.customRegistration
+        googleRegistration = !args.customRegistration
 
-        if(customRegistration){
-            passInput.visibility = View.GONE
-            passInput2.visibility = View.GONE
-            passText.visibility = View.GONE
-            passText2.visibility = View.GONE
+        if(googleRegistration){
+            passLayout.visibility = View.GONE
+            pass2Layout.visibility = View.GONE
             emailInput.setText(args.email)
             emailInput.isEnabled = false
         }
@@ -112,7 +113,7 @@ class RegistrationFragment : Fragment() {
 
                 loadingBar(true)
 
-                if (args.customRegistration) {
+                if (!googleRegistration) {
                     auth.createUserWithEmailAndPassword(email, pass)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
@@ -175,14 +176,14 @@ class RegistrationFragment : Fragment() {
         }
         else{
             progressBar.visibility = View.GONE
-            emailInput.isEnabled = customRegistration
+            emailInput.isEnabled = !googleRegistration
             nameInput.isEnabled = true
             phoneInput.isEnabled = true
             ageInput.isEnabled = true
             descInput.isEnabled = true
             cityInput.isEnabled = true
 
-            if(customRegistration){
+            if(!googleRegistration){
                 passInput.isEnabled = true
                 passInput2.isEnabled = true
             }
@@ -197,50 +198,62 @@ class RegistrationFragment : Fragment() {
 
         if(emailInput.text.toString() == ""){
             result = false
-            emailText.text = getString(R.string.warning_email)
-            emailText.setTextColor(Color.RED)
+            emailLayout.error = getString(R.string.warning_email)
+        }
+        else{
+            emailLayout.error = null
         }
         if(nameInput.text.toString() == ""){
             result = false
-            nameText.text = getString(R.string.warning_name)
-            nameText.setTextColor(Color.RED)
+            nameLayout.error = getString(R.string.warning_name)
+        }
+        else{
+            nameLayout.error = null
         }
         if(phoneInput.text.toString() == ""){
             result = false
-            phoneText.text = getString(R.string.warning_phone)
-            phoneText.setTextColor(Color.RED)
+            phoneLayout.error = getString(R.string.warning_phone)
+        }
+        else if(phoneInput.text.length < 11){
+            result = false
+            phoneLayout.error = getString(R.string.warning_phone_size)
+        }
+        else{
+            phoneLayout.error = null
         }
         if(ageInput.text.toString() == ""){
             result = false
-            ageText.text = getString(R.string.warning_age)
-            ageText.setTextColor(Color.RED)
+            ageLayout.error = getString(R.string.warning_age)
         }
         else if(ageInput.text.toString().toInt() < 14){
             result = false
-            ageText.text = getString(R.string.warning_age_limit)
-            ageText.setTextColor(Color.RED)
+            ageLayout.error = getString(R.string.warning_age_limit)
         }
-        if(descInput.text.toString().length > 200){
-            result = false
-            descText.text = getString(R.string.warning_desc_size)
-            descText.setTextColor(Color.RED)
+        else{
+            ageLayout.error = null
         }
-        if(passInput.visibility == View.VISIBLE) {
+        if(passLayout.visibility == View.VISIBLE) {
             if (passInput.text.toString().length < 8) {
                 result = false
-                passText.text = getString(R.string.warning_password_size)
-                passText.setTextColor(Color.RED)
+                passLayout.error = getString(R.string.warning_password_size)
+            }
+            else{
+                passLayout.error = null
             }
             if (passInput2.text.toString() != passInput.text.toString()) {
                 result = false
-                passText2.text = getString(R.string.warning_passwords_match)
-                passText2.setTextColor(Color.RED)
+                passLayout.error = getString(R.string.warning_passwords_match)
+            }
+            else{
+                pass2Layout.error = null
             }
         }
         if(cityInput.text.toString() == ""){
             result = false
-            cityText.text = getString(R.string.warning_city)
-            cityText.setTextColor(Color.RED)
+            cityLayout.error = getString(R.string.warning_city)
+        }
+        else{
+            cityLayout.error = null
         }
         return result
     }

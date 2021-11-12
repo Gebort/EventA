@@ -9,9 +9,9 @@
     <string name="warning_email">Incorrect email</string>
     <string name="warning_name">Incorrect name</string>
     <string name="warning_age">Incorrect age</string>
-    <string name="warning_age_limit">You must be 14+ for registration</string>
+    <string name="warning_age_limit">You must be at least 14 for registration</string>
     <string name="warning_phone">Incorrect phone</string>
-    <string name="warning_desc_size">Description oversize. Limit - 200 symbols</string>
+    <string name="warning_phone_size">At least 11 digits</string>
     <string name="warning_password">Incorrect password</string>
     <string name="warning_password_size">Password must be at least 8 symbols</string>
     <string name="warning_passwords_match">Passwords not the same</string>
@@ -24,4 +24,5 @@
     <string name="event_not_deleted">Failed to delete the event</string>
     <string name="event_delete_confirm">Do you want to delete the event -\n"%1$s"?</string>
     <string name="google_auth_text">Or use google account</string>
+    <string name="verification_letter_resend">Letter was sent again</string>
 </resources>
