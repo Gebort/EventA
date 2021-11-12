@@ -28,6 +28,7 @@ class OrginisedEvents : Fragment() {
     private lateinit var rView: RecyclerView
     private lateinit var layoutEmpty: ConstraintLayout
     private var adapter: orgEventsAdapter? = null
+    private lateinit var model: orgEventsViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,7 +58,9 @@ class OrginisedEvents : Fragment() {
             findNavController().navigate(action)
         }
 
-        val model: orgEventsViewModel by activityViewModels()
+        val modelN: orgEventsViewModel by activityViewModels()
+        model = modelN
+
         if(adapter == null){
             adapter = orgEventsAdapter(model.getEvents().value!!)
             rView.adapter = adapter
@@ -79,7 +82,6 @@ class OrginisedEvents : Fragment() {
     private fun updateData(){
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
-        val model: orgEventsViewModel by activityViewModels()
         model.email = User.email
         model.loadOrgEvents()
     }

@@ -26,6 +26,7 @@ class AllEvents : Fragment() {
     private lateinit var layoutEmpty: ConstraintLayout
     private var adapter: allEventsAdapter? = null
     private lateinit var v: View
+    private lateinit var model: allEventsViewModel
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -72,15 +73,18 @@ class AllEvents : Fragment() {
         rView = i.findViewById(R.id.rView)
         rView.layoutManager = LinearLayoutManager(activity?.applicationContext)
 
-        val model: allEventsViewModel by activityViewModels()
+        val modelN: allEventsViewModel by activityViewModels()
+        model = modelN
         if(adapter == null){
             adapter = allEventsAdapter(rView, model.eventMin, model.getEvents().value!!.toMutableList(), ::onScrollEnd)
             rView.adapter = adapter
         }
         activity?.let {
             model.getEvents().observe(it, { events ->
-                val b = adapter!!.events.size
                 adapter!!.events = events.toMutableList()
+                if (adapter!!.isLoading){
+                    adapter!!.events.add(null)
+                }
                 onEventsResult(model.change, model.pos, model.getEvents().value!!.size)
             })
         }
@@ -104,9 +108,6 @@ class AllEvents : Fragment() {
         val actionBar = act.supportActionBar
         actionBar?.customView = v
         actionBar?.setDisplayShowCustomEnabled(true)
-        if (adapter!!.events.size < adapter!!.visibleThreshold){
-            onScrollEnd()
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -144,7 +145,6 @@ class AllEvents : Fragment() {
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
         adapter!!.setLoaded()
-        val model: allEventsViewModel by activityViewModels()
         model.city = city
         model.age = User.age
         model.email = User.email
@@ -157,7 +157,6 @@ class AllEvents : Fragment() {
             adapter!!.isLoading = true
             adapter!!.events.add(null)
             adapter!!.notifyItemInserted(adapter!!.events.size - 1)
-            val model: allEventsViewModel by activityViewModels()
             model.eventCount += model.eventIncrement
             model.loadAllEvents(false)
         }
@@ -174,17 +173,13 @@ class AllEvents : Fragment() {
             layoutEmpty.visibility = View.GONE
         }
 
-        if (adapter!!.isLoading) {
-            if (type == allEventsViewModel.Types.MODIFIED || type == allEventsViewModel.Types.REMOVED) {
-                adapter!!.events.add(null)
-            }
-        }
-
         when (type) {
             allEventsViewModel.Types.ADDED -> {
                 if (adapter!!.isLoading){
                     adapter!!.setLoaded()
-                    adapter!!.notifyItemChanged(pos)
+                    adapter!!.events.remove(null)
+                    adapter!!.notifyItemRemoved(adapter!!.events.size)
+                    adapter!!.notifyItemInserted(pos)
                 }
                 else {
                     adapter!!.notifyItemInserted(pos)
@@ -195,7 +190,7 @@ class AllEvents : Fragment() {
             }
             allEventsViewModel.Types.REMOVED -> {
                 adapter!!.notifyItemRemoved(pos)
-                if (adapter!!.events.size == 0){
+                if (adapter!!.events.size < model.eventMin){
                     onScrollEnd()
                 }
             }

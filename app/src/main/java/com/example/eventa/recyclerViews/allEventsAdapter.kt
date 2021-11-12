@@ -127,6 +127,7 @@ class allEventsAdapter(val rView: RecyclerView, var visibleThreshold: Int, var e
 
     }
 
+
     fun setLoaded(){
         isLoading = false
     }

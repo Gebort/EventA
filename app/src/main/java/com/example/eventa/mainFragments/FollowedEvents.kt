@@ -29,6 +29,7 @@ class FollowedEvents : Fragment() {
     private lateinit var rView: RecyclerView
     private lateinit var layoutEmpty: ConstraintLayout
     private var adapter: followedEventsAdapter? = null
+    private lateinit var model: followedEventsViewModel
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -51,11 +52,14 @@ class FollowedEvents : Fragment() {
         rView = i.findViewById(R.id.rViewFollowedEvents)
         rView.layoutManager = LinearLayoutManager(activity?.applicationContext)
 
-        val model: followedEventsViewModel by activityViewModels()
+        val modelN: followedEventsViewModel by activityViewModels()
+        model = modelN
+
         if(adapter == null){
             adapter = followedEventsAdapter(model.getEvents().value!!)
             rView.adapter = adapter
         }
+
         activity?.let {
             model.getEvents().observe(it, { events ->
                 adapter!!.events = events
@@ -73,7 +77,6 @@ class FollowedEvents : Fragment() {
     private fun updateData(){
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
-        val model: followedEventsViewModel by activityViewModels()
         model.email = User.email
         model.loadFollowedEvents()
     }

@@ -1,24 +1,25 @@
 package com.example.eventa.viewModels
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.eventa.DBHelper
 import com.example.eventa.Event
-import com.example.eventa.User
-import com.google.firestore.v1.DocumentChange
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-//TODO загружать только N событий, подгружать еще n когда пользователь дойдет до конца листа
 class allEventsViewModel : ViewModel() {
     var email = ""
     var city = ""
     var age = -1
 
-    var eventIncrement = 5
-    var eventMin = 15
+    var eventIncrement = 10
+    var eventMin = 20
     var eventCount = eventMin
+    var updateDelay = 10000L
 
 
     private val events = MutableLiveData<MutableList<Event>>()
@@ -34,6 +35,7 @@ class allEventsViewModel : ViewModel() {
         return events
     }
 
+    @DelicateCoroutinesApi
     fun loadAllEvents(clear: Boolean) {
         if(email != "" && city != "" && age != -1) {
             if (clear) {
@@ -41,6 +43,12 @@ class allEventsViewModel : ViewModel() {
                 events.value = mutableListOf()
             }
             DBHelper.loadAvalEvents(email, city, age, eventCount.toLong(), ::onAllEventsResult)
+
+            //TODO не изученно влияет на взаимодействие с событиями. Слишком частая проверка ломает логику
+            GlobalScope.launch {
+                delay(updateDelay)
+                delayUpdateCheck()
+            }
         }
         else
             Log.d("allEventsViewModel", "No input data, cant load all events")
@@ -73,8 +81,7 @@ class allEventsViewModel : ViewModel() {
                             event.currPartNumber < event.partNumber &&
                             event.minAge <= age) {
                         events.value!!.add(event)
-                        //TODO нужно сортировать еще по часу и минутам. Возможен рассинхрон с сервером
-                        val newEvents = events.value!!.sortedBy { it.date }.toMutableList()
+                        val newEvents = ((events.value!!.sortedBy { it.date }).sortedBy { it.hour }).sortedBy { it.min }.toMutableList()
                         pos = newEvents.indexOf(event)
                         events.value = newEvents
                     }
@@ -92,6 +99,13 @@ class allEventsViewModel : ViewModel() {
                     events.value = events.value
                 }
             }
+        }
+    }
+
+    private fun delayUpdateCheck(){
+        if (events.value!!.size < eventMin) {
+            eventCount += eventIncrement
+            loadAllEvents(false)
         }
     }
 
