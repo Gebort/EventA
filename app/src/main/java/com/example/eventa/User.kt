@@ -6,6 +6,7 @@ import com.google.firebase.ktx.Firebase
 object User {
     lateinit var email: String
     lateinit var name: String
+    //TODO хранить не возраст а дату рождения
     var age: Int = 0
     lateinit var phone: String
     lateinit var description: String

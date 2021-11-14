@@ -17,6 +17,9 @@
     <string name="warning_passwords_match">Passwords not the same</string>
     <string name="warning_city">Incorrect city</string>
     <string name="warning_registration_failed">Registration failed</string>
+    <string name="warning_min_age">At least 14</string>
+    <string name="warning_min_participants">At least 1 user</string>
+    <string name="warning_required">Required</string>
     <string name="organised">Organised</string>
     <string name="followed">Followed</string>
     <string name="empty_list">No events to show you</string>
@@ -25,4 +28,5 @@
     <string name="event_delete_confirm">Do you want to delete the event -\n"%1$s"?</string>
     <string name="google_auth_text">Or use google account</string>
     <string name="verification_letter_resend">Letter was sent again</string>
+    <string name="event_created">Event was created</string>
 </resources>

@@ -15,7 +15,7 @@
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:foregroundGravity="top"
+            android:foregroundGravity="bottom"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -26,115 +26,130 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/eventTitle"
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/titleLayout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Event title" />
+                    android:hint="Event title"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="30"
+                    app:errorEnabled="true">
 
-                <EditText
-                    android:id="@+id/titleInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Event name"
-                    android:inputType="textPersonName" />
-
-                <TextView
-                    android:id="@+id/numberPart"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Number of participants" />
-
-                <EditText
-                    android:id="@+id/numberInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Participants"
-                    android:inputType="numberSigned" />
-
-                <TextView
-                    android:id="@+id/minAge"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Minimum age" />
-
-                <EditText
-                    android:id="@+id/ageInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Age"
-                    android:inputType="numberSigned" />
-
-                <TextView
-                    android:id="@+id/date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Date" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/dateText"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/titleInput"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:hint="Select the date" />
+                        android:layout_height="wrap_content" />
 
-                    <Button
-                        android:id="@+id/butDatePicker"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Select" />
-                </LinearLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                    android:id="@+id/timeStart"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Time of start" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/timeText"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/ageLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginRight="4dp"
                         android:layout_weight="1"
-                        android:hint="Select the start time" />
+                        android:hint="Age"
+                        app:errorEnabled="true"
+                        app:startIconDrawable="@drawable/age_icon">
 
-                    <Button
-                        android:id="@+id/butTimePicker"
-                        android:layout_width="wrap_content"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/ageInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberSigned" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/numberLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Select" />
+                        android:layout_marginLeft="4dp"
+                        android:layout_weight="1"
+                        android:hint="Participants"
+                        app:errorEnabled="true"
+                        app:startIconDrawable="@drawable/participants_icon">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/numberInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberSigned" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/desc"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Description" />
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/descInput"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/datePickerLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="4dp"
+                        android:layout_weight="1"
+                        android:hint="Date"
+                        app:errorEnabled="true"
+                        app:startIconDrawable="@drawable/calendar_icon">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/datePickerInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/timePickerLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:layout_weight="1"
+                        android:hint="Time"
+                        app:errorEnabled="true"
+                        app:startIconDrawable="@drawable/time_icon">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/timePickerInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/descLayout"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:gravity="start|top"
                     android:hint="Description"
-                    android:inputType="textMultiLine" />
+                    app:counterEnabled="true"
+                    app:counterMaxLength="300"
+                    app:errorEnabled="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nameLayout">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/descInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <Switch
                     android:id="@+id/locationSwitch"
@@ -142,29 +157,42 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:checked="true"
-                    android:text="Location" />
+                    android:text="Physical location" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal">
 
+
                     <TextView
                         android:id="@+id/cityText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="4"
                         android:text="Khabarovsk" />
 
-                    <EditText
-                        android:id="@+id/locInput"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/locLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
+                        android:layout_marginLeft="8dp"
                         android:layout_weight="1"
-                        android:ems="10"
-                        android:hint="Place"
-                        android:inputType="textPersonName" />
+                        android:hint="Location"
+                        app:counterEnabled="true"
+                        app:counterMaxLength="30"
+                        app:errorEnabled="true"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/nameLayout">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/locInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
                 <Switch
@@ -190,10 +218,12 @@
 
                 <Button
                     android:id="@+id/createEventBut"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
+                    android:layout_marginLeft="10dp"
                     android:layout_marginTop="20dp"
+                    android:layout_marginRight="10dp"
                     android:text="Create" />
 
             </LinearLayout>

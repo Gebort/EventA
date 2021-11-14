@@ -80,31 +80,11 @@ class Settings : Fragment() {
 
     @SuppressLint("NewApi")
     private fun uiEnabled(status: Boolean){
-        if(status) {
-            nameInput.isFocusableInTouchMode = true
-            phoneInput.isFocusableInTouchMode = true
-            ageInput.isFocusableInTouchMode = true
-            descInput.isFocusableInTouchMode = true
-            cityInput.isFocusableInTouchMode = true
-            nameInput.background = savedBackground
-            phoneInput.background = savedBackground
-            ageInput.background = savedBackground
-            descInput.background = savedBackground
-            cityInput.background = savedBackground
-
-        }
-        else{
-            nameInput.focusable = View.NOT_FOCUSABLE
-            phoneInput.focusable = View.NOT_FOCUSABLE
-            ageInput.focusable = View.NOT_FOCUSABLE
-            descInput.focusable = View.NOT_FOCUSABLE
-            cityInput.focusable = View.NOT_FOCUSABLE
-            nameInput.setBackgroundColor(Color.TRANSPARENT)
-            phoneInput.setBackgroundColor(Color.TRANSPARENT)
-            descInput.setBackgroundColor(Color.TRANSPARENT)
-            ageInput.setBackgroundColor(Color.TRANSPARENT)
-            cityInput.setBackgroundColor(Color.TRANSPARENT)
-        }
+            nameInput.isEnabled = status
+            phoneInput.isEnabled = status
+            ageInput.isEnabled = status
+            descInput.isEnabled = status
+            cityInput.isEnabled = status
     }
 
     private fun changeData(){

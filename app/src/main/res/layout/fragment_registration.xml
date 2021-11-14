@@ -144,7 +144,8 @@
                         android:hint="City"
                         app:counterEnabled="true"
                         app:counterMaxLength="30"
-                        app:errorEnabled="true">
+                        app:errorEnabled="true"
+                        app:startIconDrawable="@drawable/city_icon">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/cityReg"
