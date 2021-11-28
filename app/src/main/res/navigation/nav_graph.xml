@@ -38,7 +38,16 @@
         android:id="@+id/orgEvents"
         android:name="com.example.eventa.mainFragments.OrgEvents"
         android:label="fragment_org_events"
-        tools:layout="@layout/fragment_org_events" />
+        tools:layout="@layout/fragment_org_events" >
+        <argument
+            android:name="edit"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="eventIndex"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
     <fragment
         android:id="@+id/settings"
         android:name="com.example.eventa.mainFragments.Settings"

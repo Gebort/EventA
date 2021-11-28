@@ -1,19 +1,25 @@
 package com.example.eventa.recyclerViews
 
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.eventa.DBHelper
 import com.example.eventa.Event
 import com.example.eventa.R
+import com.example.eventa.mainFragments.MyEventsDirections
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import java.text.SimpleDateFormat
+import java.time.*
+import java.time.format.DateTimeFormatter
 import java.util.*
+
 
 class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
         RecyclerView.Adapter<orgEventsAdapter.MyViewHolder>(){
@@ -59,14 +65,18 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
         return MyViewHolder(itemView)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(h: MyViewHolder, i: Int) {
-        val dateStr = Date(events[i].date)
-        val format = SimpleDateFormat("dd.MM.yyyy")
-        h.date?.text = format.format(dateStr)
+        val instant = Instant.ofEpochMilli(events[i]!!.date)
+        var dateSnap = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+
+        val dateStr = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dateSnap)
+        val timeStr = DateTimeFormatter.ofPattern("HH.mm").format(dateSnap)
+        h.date?.text = dateStr
         h.desc?.text = events[i].desc
         h.loc?.text = events[i].loc
         h.number?.text = "${events[i].currPartNumber}/${events[i].partNumber}"
-        h.time?.text = "${events[i].hour}:${events[i].min}"
+        h.time?.text = timeStr
         h.orgName?.text = "Organisator - ${events[i].orgName}"
         h.title?.text = events[i].title
 
@@ -105,7 +115,11 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
 
         h.edit?.setOnClickListener {
             h.edit?.isEnabled = false
-            //TODO возможность менять события
+            val action = MyEventsDirections.actionMyEventsToOrgEvents()
+            action.edit = true
+            action.eventIndex = i
+            rView.findNavController().navigate(action)
+            h.edit?.isEnabled = true
         }
 
         h.delete?.setOnClickListener {
@@ -118,7 +132,9 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
                     dialog.cancel()
                 }
                 .setPositiveButton("Yes"){ _, _ ->
-                    DBHelper.deleteEvent(events[i].id.toString(), events[i].city.toString(), ::onDeleteResult)
+                    DBHelper.deleteEvent(events[i].id.toString()){ result ->
+                        onDeleteResult(result)
+                    }
                 }
                 .setOnCancelListener{
                     h.delete?.isEnabled = true

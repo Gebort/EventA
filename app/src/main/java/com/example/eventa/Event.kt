@@ -7,8 +7,6 @@ data class Event(
         var currPartNumber: Int = -1,
         var minAge: Int = -1,
         var date: Long = -1,
-        var hour: Int = -1,
-        var min: Int = -1,
         var desc: String? = "",
         var city: String? = "",
         var loc: String? = null,

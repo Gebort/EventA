@@ -3,9 +3,7 @@ package com.example.eventa.mainFragments
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.text.Selection.setSelection
 import android.text.format.DateFormat.is24HourFormat
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +12,16 @@ import android.widget.EditText
 import android.widget.Switch
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.navigation.navArgument
 import com.example.eventa.DBHelper
+import com.example.eventa.Event
 import com.example.eventa.R
 import com.example.eventa.User
+import com.example.eventa.viewModels.orgEventsViewModel
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -25,13 +29,15 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
-import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
 import java.text.SimpleDateFormat
-import java.time.LocalTime
+import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 
 class OrgEvents : Fragment() {
+
+    private var edit = false
+    private var eventToChange: Event? = null
 
     private lateinit var eventInput: EditText
     private lateinit var partNumbInput: EditText
@@ -67,12 +73,25 @@ class OrgEvents : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         val i = inflater.inflate(R.layout.fragment_org_events, container, false)
 
-        activity?.title = "New event"
+        val args: OrgEventsArgs by navArgs()
+        edit = args.edit
+        val index = args.eventIndex
+        if (index != -1){
+            val model: orgEventsViewModel by activityViewModels()
+            eventToChange = model.getEvents().value?.get(index)
+        }
+
+        if (!edit) {
+            activity?.title = "New event"
+        }
+        else{
+            activity?.title = "Edit event"
+        }
 
         eventInput = i.findViewById(R.id.titleInput)
         partNumbInput = i.findViewById(R.id.numberInput)
@@ -109,16 +128,7 @@ class OrgEvents : Fragment() {
 
         locSwitch.setOnClickListener{
             loc = !loc
-            locInput.isEnabled = loc
-            if(!loc) {
-                locInput.setText(getText(R.string.no_place))
-                cityText.setText(getText(R.string.no_city))
-            }
-            else {
-                locInput.setText("")
-                cityText.setText(User.city)
-            }
-            cityText.isEnabled = loc
+            locEnabled(loc)
         }
 
         dateInput.setOnFocusChangeListener { _, b ->
@@ -158,11 +168,10 @@ class OrgEvents : Fragment() {
                                 .build()
 
                 picker.addOnPositiveButtonClickListener {
-                    val hour = picker.hour
-                    val min = picker.minute
-                    //нужно отбросить последние 3 цифры так как в строке содержатся секунды (hh:mm:ss). Отбрасываем :ss
-                    var date = DateTimeFormatter.ISO_LOCAL_TIME.format(LocalTime.of(hour, min)).dropLast(3)
-                    timeInput.setText(date)
+                    this.hour = picker.hour
+                    this.min = picker.minute
+                    val time = DateTimeFormatter.ofPattern("HH:mm").format(LocalTime.of(hour, min))
+                    timeInput.setText(time)
                 }
 
                 fragmentManager?.let { it1 -> picker.show(it1, "timePicker") }
@@ -170,6 +179,44 @@ class OrgEvents : Fragment() {
                 timeInput.clearFocus()
             }
         }
+
+
+        if (!edit){
+            createBut.text = "Create new event"
+        }
+        else{
+            createBut.text = "Edit the event"
+            eventInput.setText(eventToChange?.title)
+            partNumbInput.setText(eventToChange?.partNumber.toString())
+            ageInput.setText(eventToChange?.minAge.toString())
+            descInput.setText(eventToChange?.desc)
+            val instant = eventToChange?.date?.let { Instant.ofEpochMilli(it) }
+            var dateSnap = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+            hour = dateSnap.hour
+            min = dateSnap.minute
+            date = dateSnap.minusHours(hour.toLong()).minusMinutes(min.toLong()).toEpochSecond()*1000  + TimeZone.getDefault().rawOffset - TimeZone.getDefault().dstSavings
+            dateInput.setText(DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dateSnap))
+            timeInput.setText(DateTimeFormatter.ofPattern("HH.mm").format(dateSnap))
+            if (eventToChange?.city == null){
+                loc = false
+                locEnabled(loc)
+            }
+            else{
+                loc = true
+                locEnabled(loc)
+                cityText.setText(eventToChange?.city)
+                locInput.setText(eventToChange?.loc)
+            }
+            locSwitch.isChecked = loc
+            public = eventToChange?.public == true
+            email = eventToChange?.showEmail == true
+            phone = eventToChange?.showNumber == true
+            publicSwitch.isChecked = public
+            emailSwitch.isChecked = email
+            phoneSwitch.isChecked = phone
+
+        }
+
 
         createBut.setOnClickListener {
             if (checkInput()) {
@@ -179,13 +226,16 @@ class OrgEvents : Fragment() {
                 if (loc)
                     city = User.city
 
-                DBHelper.fillEventData(
+                val dateSnapLocal = date + LocalTime.of(hour, min).toSecondOfDay()*1000
+                val dateSnapUTC = dateSnapLocal - TimeZone.getDefault().rawOffset - TimeZone.getDefault().dstSavings
+
+                val event = Event(
+                        eventToChange?.id,
                         eventInput.text.toString(),
                         partNumbInput.text.toString().toInt(),
+                        0,
                         ageInput.text.toString().toInt(),
-                        date,
-                        hour,
-                        min,
+                        dateSnapUTC,
                         descInput.text.toString(),
                         city,
                         locInput.text.toString(),
@@ -194,9 +244,19 @@ class OrgEvents : Fragment() {
                         phoneSwitch.isChecked,
                         User.name,
                         User.phone,
-                        User.email,
-                        ::onCreateResult
+                        User.email
                 )
+
+                if (edit){
+                    DBHelper.updateEventData(event){ result ->
+                        onEditResult(result)
+                    }
+                }
+                else{
+                    DBHelper.fillEventData(event){ result ->
+                        onCreateResult(result)
+                }
+                }
             }
         }
 
@@ -209,8 +269,33 @@ class OrgEvents : Fragment() {
             findNavController().popBackStack()
         }
         else{
-
+            Snackbar.make(createBut, R.string.event_created_error, Snackbar.LENGTH_SHORT).show()
+            createBut.isEnabled = true
         }
+    }
+
+    private fun onEditResult(result: Boolean) {
+        if (result) {
+            Snackbar.make(createBut, R.string.event_edited, Snackbar.LENGTH_SHORT).show()
+            findNavController().popBackStack()
+        }
+        else{
+            Snackbar.make(createBut, R.string.event_edited_error, Snackbar.LENGTH_SHORT).show()
+            createBut.isEnabled = true
+        }
+    }
+
+    private fun locEnabled(enabled: Boolean){
+        locInput.isEnabled = loc
+        if(!loc) {
+            locInput.setText(getText(R.string.no_place))
+            cityText.setText(getText(R.string.no_city))
+        }
+        else {
+            locInput.setText("")
+            cityText.setText(User.city)
+        }
+        cityText.isEnabled = loc
     }
 
     private fun checkInput(): Boolean {

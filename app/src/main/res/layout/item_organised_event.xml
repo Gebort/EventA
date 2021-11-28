@@ -28,12 +28,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:text="Android studio coding"
-            app:layout_constraintBottom_toBottomOf="@+id/numberText"
-            app:layout_constraintEnd_toStartOf="@+id/numberText"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView12"
+            app:layout_constraintEnd_toStartOf="@+id/imageView12"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/numberText" />
+            app:layout_constraintTop_toTopOf="@+id/imageView12" />
 
         <TextView
             android:id="@+id/dateText"
@@ -42,9 +42,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text="01.11.2011"
-            app:layout_constraintBottom_toBottomOf="@+id/titleText"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView12"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/titleText" />
+            app:layout_constraintTop_toTopOf="@+id/imageView12" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutExtra"
@@ -84,27 +84,29 @@
                 style="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginStart="8dp"
                 android:text="st. Serisheva 47"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/descText" />
+                app:layout_constraintBottom_toBottomOf="@+id/imageView11"
+                app:layout_constraintStart_toEndOf="@+id/imageView11"
+                app:layout_constraintTop_toTopOf="@+id/imageView11" />
 
             <TextView
                 android:id="@+id/timeText"
                 style="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="8dp"
                 android:text="17:19"
-                app:layout_constraintBottom_toBottomOf="@+id/locText"
-                app:layout_constraintStart_toEndOf="@+id/locText"
-                app:layout_constraintTop_toTopOf="@+id/locText" />
+                app:layout_constraintBottom_toBottomOf="@+id/imageView13"
+                app:layout_constraintStart_toEndOf="@+id/imageView13"
+                app:layout_constraintTop_toTopOf="@+id/imageView13" />
 
             <Button
                 android:id="@+id/deleteBut"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="-16dp"
                 android:layout_marginEnd="16dp"
                 android:gravity="center|right"
                 android:text="Delete"
@@ -123,15 +125,16 @@
                 android:id="@+id/orgNameText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:text="Organisator: Igor"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/locText" />
+                app:layout_constraintTop_toBottomOf="@+id/imageView14" />
 
             <TextView
                 android:id="@+id/orgEmailText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Email: testyemail@gmail.com"
                 android:visibility="visible"
                 app:layout_constraintStart_toStartOf="parent"
@@ -141,24 +144,61 @@
                 android:id="@+id/orgPhoneText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Phone: 89241001010"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/orgEmailText" />
 
+            <TextView
+                android:id="@+id/numberText"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_marginStart="8dp"
+                android:text="1/4"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView14"
+                app:layout_constraintStart_toEndOf="@+id/imageView14"
+                app:layout_constraintTop_toTopOf="@+id/imageView14" />
+
+            <ImageView
+                android:id="@+id/imageView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/descText"
+                app:srcCompat="@drawable/city_icon" />
+
+            <ImageView
+                android:id="@+id/imageView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView11"
+                app:srcCompat="@drawable/time_icon" />
+
+            <ImageView
+                android:id="@+id/imageView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView13"
+                app:srcCompat="@drawable/participants_icon" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/numberText"
-            style="@style/TextAppearance.AppCompat.Subhead"
+        <ImageView
+            android:id="@+id/imageView12"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:text="1/4"
-            android:textSize="18sp"
             app:layout_constraintEnd_toStartOf="@+id/dateText"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/calendar_icon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

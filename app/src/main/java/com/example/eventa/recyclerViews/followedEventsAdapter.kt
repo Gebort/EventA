@@ -1,10 +1,12 @@
 package com.example.eventa.recyclerViews
 
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.eventa.DBHelper
@@ -12,6 +14,8 @@ import com.example.eventa.Event
 import com.example.eventa.R
 import com.example.eventa.User
 import java.text.SimpleDateFormat
+import java.time.*
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class followedEventsAdapter(var events: List<Event>):
@@ -55,14 +59,18 @@ class followedEventsAdapter(var events: List<Event>):
         return MyViewHolder(itemView)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(h: MyViewHolder, i: Int) {
-        val dateStr = Date(events[i].date)
-        val format = SimpleDateFormat("dd.MM.yyyy")
-        h.date?.text = format.format(dateStr)
+        val instant = Instant.ofEpochMilli(events[i]!!.date)
+        var dateSnap = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+
+        val dateStr = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dateSnap)
+        val timeStr = DateTimeFormatter.ofPattern("HH.mm").format(dateSnap)
+        h.date?.text = dateStr
         h.desc?.text = events[i].desc
         h.loc?.text = events[i].loc
         h.number?.text = "${events[i].currPartNumber}/${events[i].partNumber}"
-        h.time?.text = "${events[i].hour}:${events[i].min}"
+        h.time?.text = timeStr
         h.orgName?.text = "Organisator - ${events[i].orgName}"
         h.title?.text = events[i].title
         h.unsign?.isEnabled = true
@@ -101,7 +109,9 @@ class followedEventsAdapter(var events: List<Event>):
             h.unsign?.isEnabled = false
             mExpandedPosition = -1
             previousExpandedPosition = -1
-            DBHelper.removeParticipant(events[i].id!!, events[i].city!!, User.email, ::onRemoveResult)
+            DBHelper.removeParticipant(events[i].id!!, User.email){ result ->
+                onRemoveResult(result)
+            }
         }
 
     }

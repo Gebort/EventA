@@ -37,7 +37,7 @@ class AllEvents : Fragment() {
 
         activity?.title = ""
 
-        val data = arrayOf(User.city, "None")
+        val data = arrayOf(User.city, "Global")
 
         prBar = i.findViewById(R.id.progressBar)
         prBar.isEnabled = false
@@ -47,22 +47,6 @@ class AllEvents : Fragment() {
         layoutEmpty.visibility = View.GONE
 
         v = inflater.inflate(R.layout.spinner_city, null)
-
-        spinner = v as Spinner
-        val adapterSpinner = activity?.applicationContext?.let { ArrayAdapter(it, R.layout.spinner_city_item, data) }
-        adapterSpinner?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapterSpinner
-        spinner.setSelection(0, false)
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-            }
-
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                updateData(data[position])
-            }
-
-        }
 
         swipeR = i.findViewById(R.id.swiperefresh)
         swipeR.setOnRefreshListener {
@@ -88,8 +72,35 @@ class AllEvents : Fragment() {
                 onEventsResult(model.change, model.pos, model.getEvents().value!!.size)
             })
         }
-        if (model.city != data[spinner.selectedItemPosition] || model.email != User.email || model.age != User.age){
-            updateData(data[0])
+
+        spinner = v as Spinner
+        val adapterSpinner = activity?.applicationContext?.let { ArrayAdapter(it, R.layout.spinner_city_item, data) }
+        adapterSpinner?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapterSpinner
+        if (model.city != ""){
+            if (model.city == User.city){
+                spinner.setSelection(0, false)
+            }
+            else if (model.city == null){
+                spinner.setSelection(1, false)
+            }
+            else{
+                spinner.setSelection(0, false)
+                updateData(data[0])
+            }
+        }
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val city = model.city ?: "Global"
+                if (city != data[spinner.selectedItemPosition] || model.email != User.email || model.age != User.age){
+                    updateData(data[position])
+                }
+            }
+
         }
 
         return i
@@ -145,7 +156,8 @@ class AllEvents : Fragment() {
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
         adapter!!.setLoaded()
-        model.city = city
+        if (city == "Global") model.city = null
+        else model.city = city
         model.age = User.age
         model.email = User.email
         model.eventCount = model.eventMin

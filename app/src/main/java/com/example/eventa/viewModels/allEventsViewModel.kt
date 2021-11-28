@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class allEventsViewModel : ViewModel() {
     var email = ""
-    var city = ""
+    var city: String? = ""
     var age = -1
 
     var eventIncrement = 5
@@ -36,13 +36,16 @@ class allEventsViewModel : ViewModel() {
         return events
     }
 
+    @DelicateCoroutinesApi
     fun loadAllEvents(clear: Boolean) {
         if(email != "" && city != "" && age != -1) {
             if (clear) {
                 change = Types.CLEARED
                 events.value = mutableListOf()
             }
-            DBHelper.loadAvalEvents(email, city, age, eventCount.toLong(), ::onAllEventsResult)
+            DBHelper.loadAvalEvents(city, eventCount.toLong()){ event, result ->
+                onAllEventsResult(event, result)
+            }
 
             delayUpdateCheck()
         }

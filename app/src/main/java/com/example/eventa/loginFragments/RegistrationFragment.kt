@@ -117,17 +117,19 @@ class RegistrationFragment : Fragment() {
                     auth.createUserWithEmailAndPassword(email, pass)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    DBHelper.fillUserData(name, email, phone, age, desc, city, ::onRegistrationResult)
+                                    DBHelper.fillUserData(name, email, phone, age, desc, city){ result ->
+                                        onRegistrationResult(result)
+                                    }
                                     sendVerificationEmail()
                                 } else {
                                     loadingBar(false)
-                                    val error = task.exception
-                                    val foo = 2
                                     warningText.text = getString(R.string.warning_registration_failed)
                                 }
                             }
                 } else {
-                    DBHelper.fillUserData(name, email, phone, age, desc, city, ::onRegistrationResult)
+                    DBHelper.fillUserData(name, email, phone, age, desc, city){ result ->
+                        onRegistrationResult(result)
+                    }
                 }
             }
         }
@@ -145,7 +147,7 @@ class RegistrationFragment : Fragment() {
         val action = RegistrationFragmentDirections.actionRegistrationFragmentToLoginFragment()
         findNavController().navigate(action)
     }
-//Callback отправляемый в регистрацию через гугл
+//Callback отправляемый при результате внесения данных в firestore
     private fun onRegistrationResult(result: Boolean){
         if(result) {
             User.age = age

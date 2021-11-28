@@ -140,7 +140,9 @@ class LoginFragment : Fragment() {
                         if (currentUser.isEmailVerified) {
                             email = currentUser.email
                             warningText.visibility = View.GONE
-                            email?.let { DBHelper.emailCheck(it, ::onEmailCheckResult) }
+                            email?.let { DBHelper.emailCheck(it){ result ->
+                                onEmailCheckResult(result)
+                            } }
                         }
                         else{
                             warningText.visibility = View.VISIBLE

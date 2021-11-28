@@ -28,7 +28,9 @@ class orgEventsViewModel : ViewModel() {
         if (email != "") {
             change = Types.CLEARED
             events.value = mutableListOf()
-            DBHelper.loadOrganisedEvents(User.email, ::onOrgEventsResult)
+            DBHelper.loadOrganisedEvents(User.email){ event, pos, type ->
+                onOrgEventsResult(event, pos, type)
+            }
         } else {
             Log.d("orgEventsViewModel", "No input data, cant load all events")
         }

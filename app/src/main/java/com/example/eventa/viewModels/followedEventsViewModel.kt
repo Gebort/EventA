@@ -28,7 +28,9 @@ class followedEventsViewModel : ViewModel() {
         if (email != "") {
             change = Types.CLEARED
             events.value = mutableListOf()
-            DBHelper.loadFollowedEvents(email, ::onOrgEventsResult)
+            DBHelper.loadFollowedEvents(email){ event, pos, type ->
+                onOrgEventsResult(event, pos, type)
+            }
         }
         else {
             Log.d("followedEventsViewModel", "No input data, cant load all events")

@@ -16,6 +16,7 @@ object DBHelper {
     var avalEventsListener: ListenerRegistration? = null
     var followedEventsListener: ListenerRegistration? = null
     var orgEventsListener: ListenerRegistration? = null
+    val events = "events"
 
      fun emailCheck(
              email: String,
@@ -72,64 +73,73 @@ object DBHelper {
             }
     }
 
-    fun fillEventData(title: String,
-                      partNumber: Int,
-                      minAge: Int,
-                      date: Long,
-                      hour: Int,
-                      min: Int,
-                      desc: String,
-                      city: String?,
-                      loc: String?,
-                      public: Boolean,
-                      showEmail: Boolean,
-                      showNumber: Boolean,
-                      orgName: String,
-                      orgPhone: String,
-                      orgEmail: String,
-                      callback: KFunction1<Boolean, Unit>)
+    fun fillEventData(event: Event, callback: (Boolean) -> Unit)
     {
         val db = Firebase.firestore
 
         val docData = hashMapOf(
-                "title" to title,
-                "partNumber" to partNumber,
-                "currPartNumber" to 0,
-                "minAge" to minAge,
-                "desc" to desc,
-                "date" to date,
-                "hour" to hour,
-                "min" to min,
-                "loc" to loc,
-                "public" to public,
-                "showEmail" to showEmail,
-                "showNumber" to showNumber,
-                "orgName" to orgName,
-                "orgPhone" to orgPhone,
-                "orgEmail" to orgEmail
+                "title" to event.title,
+                "partNumber" to event.partNumber,
+                "currPartNumber" to event.currPartNumber,
+                "minAge" to event.minAge,
+                "desc" to event.desc,
+                "date" to event.date,
+                "city" to event.city,
+                "loc" to event.loc,
+                "public" to event.public,
+                "showEmail" to event.showEmail,
+                "showNumber" to event.showNumber,
+                "orgName" to event.orgName,
+                "orgPhone" to event.orgPhone,
+                "orgEmail" to event.orgEmail
         )
 
-        var city2 = ""
-        if (city == null)
-            city2 = "none"
-        else
-            city2 = city
-
-            db.collection("cities").document(city2.toLowerCase(Locale.ROOT)).collection("events").add(docData)
-                    .addOnSuccessListener {
-                        callback(true)
-                    }
-                    .addOnFailureListener {
-                        callback(false)
-                    }
-
+        db.collection(events).add(docData)
+                .addOnSuccessListener {
+                    callback(true)
+                }
+                .addOnFailureListener {
+                    callback(false)
+                }
 
     }
 
-    fun deleteEvent(id: String, city: String, callback: (Boolean) -> Unit){
+    fun updateEventData(event: Event, callback: (Boolean) -> Unit )   {
         val db = Firebase.firestore
 
-        db.collection("cities").document(city.toLowerCase(Locale.ROOT)).collection("events").document(id).delete()
+        val docData = hashMapOf(
+                "title" to event.title,
+                "partNumber" to event.partNumber,
+                "currPartNumber" to event.currPartNumber,
+                "minAge" to event.minAge,
+                "desc" to event.desc,
+                "date" to event.date,
+                "city" to event.city,
+                "loc" to event.loc,
+                "public" to event.public,
+                "showEmail" to event.showEmail,
+                "showNumber" to event.showNumber,
+                "orgName" to event.orgName,
+                "orgPhone" to event.orgPhone,
+                "orgEmail" to event.orgEmail
+        )
+
+        event.id?.let {
+            db.collection(events).document(it).set(docData)
+                .addOnSuccessListener {
+                    callback(true)
+                }
+                .addOnSuccessListener {
+                    callback(false)
+                }
+        }
+
+    }
+
+    fun deleteEvent(id: String, callback: (Boolean) -> Unit){
+        val db = Firebase.firestore
+
+        db.collection(events).document(id).delete()
             .addOnSuccessListener {
                 callback(true)
             }
@@ -140,12 +150,12 @@ object DBHelper {
 
     }
 
-    fun loadAvalEvents(email: String, city: String, age: Int, count: Long, callback: (Event, allEventsViewModel.Types) -> Unit) {
+    fun loadAvalEvents(city: String?, count: Long, callback: (Event, allEventsViewModel.Types) -> Unit) {
         val db = Firebase.firestore
 
         avalEventsListener?.remove()
-        //TODO обработка времени и даты
-        avalEventsListener = db.collection("cities").document(city.toLowerCase(Locale.ROOT)).collection("events").orderBy("date").limit(count)
+
+        avalEventsListener = db.collection(events).whereEqualTo("city", city).orderBy("date").limit(count)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load aval events: $error")
@@ -176,12 +186,11 @@ object DBHelper {
     }
 
     fun loadOrganisedEvents(email: String, callback: (Event, Int, orgEventsViewModel.Types) -> Unit){
-        //TODO поиск не только по городу пользователя но и по none (хранить мероприятия пользователя в его отдельной базе)
         val db = Firebase.firestore
 
         orgEventsListener?.remove()
 
-        orgEventsListener = db.collection("cities").document(User.city.toLowerCase(Locale.ROOT)).collection("events").whereEqualTo("orgEmail", email).orderBy("date")
+        orgEventsListener = db.collection(events).whereEqualTo("orgEmail", email).orderBy("date")
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load organised events: $error")
@@ -218,7 +227,7 @@ object DBHelper {
 
         followedEventsListener?.remove()
 
-        followedEventsListener = db.collection("cities").document(User.city.toLowerCase()).collection("events").whereArrayContains("users", email).orderBy("date")
+        followedEventsListener = db.collection(events).whereArrayContains("users", email).orderBy("date")
                 .addSnapshotListener { value, error ->
                     if (error != null){
                         Log.d("DBHelper", "Failed to load followed events: $error")
@@ -249,12 +258,12 @@ object DBHelper {
                 }
     }
 
-    fun addParticipant(id: String, city: String, email: String, callback: (Boolean) -> Unit){
+    fun addParticipant(id: String, email: String, callback: (Boolean) -> Unit){
         val db = Firebase.firestore
 
         db.runBatch { batch ->
-            batch.update(db.collection("cities").document(city.toLowerCase()).collection("events").document(id), "users", FieldValue.arrayUnion(email))
-            batch.update(db.collection("cities").document(city.toLowerCase()).collection("events").document(id), "currPartNumber", FieldValue.increment(1))
+            batch.update(db.collection(events).document(id), "users", FieldValue.arrayUnion(email))
+            batch.update(db.collection(events).document(id), "currPartNumber", FieldValue.increment(1))
         }
                 .addOnSuccessListener {
                     callback(true)
@@ -264,12 +273,12 @@ object DBHelper {
         }
     }
 
-    fun removeParticipant(id: String, city: String, email: String, callback: (Boolean) -> Unit){
+    fun removeParticipant(id: String, email: String, callback: (Boolean) -> Unit){
         val db = Firebase.firestore
 
         db.runBatch { batch ->
-            batch.update(db.collection("cities").document(city.toLowerCase()).collection("events").document(id), "users", FieldValue.arrayRemove(email))
-            batch.update(db.collection("cities").document(city.toLowerCase()).collection("events").document(id), "currPartNumber", FieldValue.increment(-1))
+            batch.update(db.collection(events).document(id), "users", FieldValue.arrayRemove(email))
+            batch.update(db.collection(events).document(id), "currPartNumber", FieldValue.increment(-1))
         }
                 .addOnSuccessListener {
                     callback(true)
