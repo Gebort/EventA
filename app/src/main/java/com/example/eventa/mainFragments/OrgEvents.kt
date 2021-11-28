@@ -7,11 +7,9 @@ import android.text.format.DateFormat.is24HourFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Switch
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -61,6 +59,8 @@ class OrgEvents : Fragment() {
     private lateinit var timeBut: Button
     private lateinit var cityText: TextView
     private lateinit var createBut: Button
+
+    private lateinit var progressBar: ProgressBar
 
     private var loc = true
     private var public = false
@@ -115,6 +115,7 @@ class OrgEvents : Fragment() {
         phoneSwitch = i.findViewById(R.id.numberSwitch)
         cityText = i.findViewById(R.id.cityText)
         createBut = i.findViewById(R.id.createEventBut)
+        progressBar = i.findViewById(R.id.progressBar)
 
         cityText.text = User.city
         locSwitch.isChecked = loc
@@ -125,6 +126,8 @@ class OrgEvents : Fragment() {
         locInput.isEnabled = loc
         cityText.isEnabled = loc
         createBut.isEnabled = true
+
+        progressBar.isVisible = false
 
         locSwitch.setOnClickListener{
             loc = !loc
@@ -221,6 +224,7 @@ class OrgEvents : Fragment() {
         createBut.setOnClickListener {
             if (checkInput()) {
                 createBut.isEnabled = false
+                progressBar.isVisible = true
 
                 var city: String? = null
                 if (loc)
@@ -264,6 +268,7 @@ class OrgEvents : Fragment() {
     }
 
     private fun onCreateResult(result: Boolean) {
+        progressBar.isVisible = false
         if (result) {
             Snackbar.make(createBut, R.string.event_created, Snackbar.LENGTH_SHORT).show()
             findNavController().popBackStack()
@@ -275,6 +280,7 @@ class OrgEvents : Fragment() {
     }
 
     private fun onEditResult(result: Boolean) {
+        progressBar.isVisible = false
         if (result) {
             Snackbar.make(createBut, R.string.event_edited, Snackbar.LENGTH_SHORT).show()
             findNavController().popBackStack()

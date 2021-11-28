@@ -158,7 +158,7 @@ class AllEvents : Fragment() {
         adapter!!.setLoaded()
         if (city == "Global") model.city = null
         else model.city = city
-        model.age = User.age
+        model.age = User.age!!
         model.email = User.email
         model.eventCount = model.eventMin
         model.loadAllEvents(true)

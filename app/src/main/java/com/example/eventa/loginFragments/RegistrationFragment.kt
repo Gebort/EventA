@@ -1,6 +1,6 @@
 package com.example.eventa.loginFragments
 
-import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +9,25 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.eventa.*
+import com.example.eventa.DBHelper
+import com.example.eventa.R
+import com.example.eventa.User
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.*
 
 class RegistrationFragment : Fragment() {
 
@@ -30,7 +41,7 @@ class RegistrationFragment : Fragment() {
     private lateinit var passInput: EditText
     private lateinit var passInput2: EditText
     private lateinit var phoneInput: EditText
-    private lateinit var ageInput: EditText
+    private lateinit var birthInput: EditText
     private lateinit var cityInput: EditText
     private lateinit var descInput: EditText
 
@@ -39,7 +50,7 @@ class RegistrationFragment : Fragment() {
     private lateinit var passLayout: TextInputLayout
     private lateinit var pass2Layout: TextInputLayout
     private lateinit var phoneLayout: TextInputLayout
-    private lateinit var ageLayout: TextInputLayout
+    private lateinit var birthLayout: TextInputLayout
     private lateinit var cityLayout: TextInputLayout
     private lateinit var descLayout: TextInputLayout
 
@@ -49,12 +60,13 @@ class RegistrationFragment : Fragment() {
     private lateinit var pass: String
     private lateinit var name: String
     private lateinit var phone: String
-    private var age: Int = -1
+    private var birth: Long = -1
     private lateinit var desc: String
     private lateinit var city: String
 
     private lateinit var regBut: Button
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -65,7 +77,7 @@ class RegistrationFragment : Fragment() {
         passInput = inflate.findViewById(R.id.passReg)
         passInput2 = inflate.findViewById(R.id.pass2Reg)
         phoneInput = inflate.findViewById(R.id.phoneReg)
-        ageInput = inflate.findViewById(R.id.ageReg)
+        birthInput = inflate.findViewById(R.id.birthReg)
         descInput = inflate.findViewById(R.id.descReg)
         cityInput = inflate.findViewById(R.id.cityReg)
 
@@ -74,7 +86,7 @@ class RegistrationFragment : Fragment() {
         passLayout = inflate.findViewById(R.id.passLayout)
         pass2Layout = inflate.findViewById(R.id.pass2Layout)
         phoneLayout = inflate.findViewById(R.id.phoneLayout)
-        ageLayout = inflate.findViewById(R.id.ageLayout)
+        birthLayout = inflate.findViewById(R.id.birthLayout)
         descLayout = inflate.findViewById(R.id.descLayout)
         cityLayout = inflate.findViewById(R.id.cityLayout)
 
@@ -99,13 +111,37 @@ class RegistrationFragment : Fragment() {
             emailInput.isEnabled = false
         }
 
+        birthInput.setOnFocusChangeListener { _, b ->
+            if (b) {
+                val constraintsBuilder =
+                        CalendarConstraints.Builder()
+                                .setValidator(DateValidatorPointBackward.now())
+                val picker =
+                        MaterialDatePicker.Builder.datePicker()
+                                .setTitleText(R.string.birth)
+                                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                                .setCalendarConstraints(constraintsBuilder.build())
+                                .build()
+
+                picker.addOnPositiveButtonClickListener { birth: Long ->
+                    this.birth = birth
+                    val birthStr = Date(birth)
+                    val format = SimpleDateFormat("dd.MM.yyyy")
+                    birthInput.setText(format.format(birthStr))
+                }
+
+                fragmentManager?.let { it1 -> picker.show(it1, "birthPicker") }
+                birthInput.isActivated = false
+                birthInput.clearFocus()
+            }
+        }
+
         regBut.setOnClickListener {
             if(checkInput()) {
 
                 email = emailInput.text.toString()
                 name = nameInput.text.toString()
                 phone = phoneInput.text.toString()
-                age = ageInput.text.toString().toInt()
                 desc = descInput.text.toString()
                 pass = passInput.text.toString()
                 city = cityInput.text.toString()
@@ -117,7 +153,7 @@ class RegistrationFragment : Fragment() {
                     auth.createUserWithEmailAndPassword(email, pass)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    DBHelper.fillUserData(name, email, phone, age, desc, city){ result ->
+                                    DBHelper.fillUserData(name, email, phone, birth, desc, city){ result ->
                                         onRegistrationResult(result)
                                     }
                                     sendVerificationEmail()
@@ -127,7 +163,7 @@ class RegistrationFragment : Fragment() {
                                 }
                             }
                 } else {
-                    DBHelper.fillUserData(name, email, phone, age, desc, city){ result ->
+                    DBHelper.fillUserData(name, email, phone, birth, desc, city){ result ->
                         onRegistrationResult(result)
                     }
                 }
@@ -150,7 +186,7 @@ class RegistrationFragment : Fragment() {
 //Callback отправляемый при результате внесения данных в firestore
     private fun onRegistrationResult(result: Boolean){
         if(result) {
-            User.age = age
+            User.birth = birth
             User.description = desc
             User.email = email
             User.name = name
@@ -169,7 +205,7 @@ class RegistrationFragment : Fragment() {
             emailInput.isEnabled = false
             nameInput.isEnabled = false
             phoneInput.isEnabled = false
-            ageInput.isEnabled = false
+            birthInput.isEnabled = false
             descInput.isEnabled = false
             passInput.isEnabled = false
             passInput2.isEnabled = false
@@ -181,7 +217,7 @@ class RegistrationFragment : Fragment() {
             emailInput.isEnabled = !googleRegistration
             nameInput.isEnabled = true
             phoneInput.isEnabled = true
-            ageInput.isEnabled = true
+            birthInput.isEnabled = true
             descInput.isEnabled = true
             cityInput.isEnabled = true
 
@@ -195,6 +231,7 @@ class RegistrationFragment : Fragment() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun checkInput(): Boolean{
         var result = true
 
@@ -223,16 +260,21 @@ class RegistrationFragment : Fragment() {
         else{
             phoneLayout.error = null
         }
-        if(ageInput.text.toString() == ""){
+        if(birthInput.text.toString() == ""){
             result = false
-            ageLayout.error = getString(R.string.warning_age)
-        }
-        else if(ageInput.text.toString().toInt() < 14){
-            result = false
-            ageLayout.error = getString(R.string.warning_age_limit)
+            birthInput.error = getString(R.string.warning_birth)
         }
         else{
-            ageLayout.error = null
+            val instant = Instant.ofEpochMilli(birth)
+            val birthSnap = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+            val nowSnap = ZonedDateTime.now()
+            if (nowSnap.year - birthSnap.year < 14) {
+                result = false
+                birthLayout.error = getString(R.string.warning_age_limit)
+            }
+            else{
+                birthLayout.error = null
+            }
         }
         if(passLayout.visibility == View.VISIBLE) {
             if (passInput.text.toString().length < 8) {

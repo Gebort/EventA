@@ -101,7 +101,12 @@ class allEventsAdapter(val rView: RecyclerView, var visibleThreshold: Int, var e
                 val timeStr = DateTimeFormatter.ofPattern("HH.mm").format(dateSnap)
                 h.date?.text = dateStr
                 h.desc?.text = events[i]!!.desc
-                h.loc?.text = events[i]!!.loc
+                if (events[i]!!.city != null){
+                    h.loc?.text = "${events[i]!!.city}, ${events[i]!!.loc}"
+                }
+                else{
+                    h.loc?.text = events[i]!!.loc
+                }
                 h.number?.text = "${events[i]!!.currPartNumber}/${events[i]!!.partNumber}"
                 h.time?.text = timeStr
                 h.title?.text = events[i]!!.title

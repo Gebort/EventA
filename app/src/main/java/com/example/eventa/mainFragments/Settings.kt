@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,11 +12,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.example.eventa.DBHelper
 import com.example.eventa.loginFragments.LoginActivity
 import com.example.eventa.R
 import com.example.eventa.User
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointBackward
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.*
 
 class Settings : Fragment() {
     private lateinit var savedBackground: Drawable
@@ -24,10 +34,11 @@ class Settings : Fragment() {
     private lateinit var butUpdate: Button
     private lateinit var nameInput: EditText
     private lateinit var phoneInput: EditText
-    private lateinit var ageInput: EditText
+    private lateinit var birthInput: EditText
     private lateinit var descInput: EditText
     private lateinit var cityInput: EditText
     private lateinit var warningText: TextView
+    private var birth: Long = 0
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +50,7 @@ class Settings : Fragment() {
 
         nameInput = i.findViewById(R.id.nameInput)
         phoneInput = i.findViewById(R.id.phoneInput)
-        ageInput = i.findViewById(R.id.ageInput)
+        birthInput = i.findViewById(R.id.birthInput)
         descInput = i.findViewById(R.id.descInput)
         butLogout = i.findViewById(R.id.logout_but)
         butUpdate = i.findViewById(R.id.updateBut)
@@ -48,7 +59,10 @@ class Settings : Fragment() {
 
         nameInput.setText(User.name)
         phoneInput.setText(User.phone)
-        ageInput.setText(User.age.toString())
+        birth = User.birth!!
+        val birthStr = Date(User.birth!!)
+        val format = SimpleDateFormat("dd.MM.yyyy")
+        birthInput.setText(format.format(birthStr))
         descInput.setText(User.description)
         cityInput.setText(User.city)
         warningText.visibility = View.GONE
@@ -56,6 +70,31 @@ class Settings : Fragment() {
         savedBackground = nameInput.background
 
         uiEnabled(false)
+
+        birthInput.setOnFocusChangeListener { _, b ->
+            if (b) {
+                val constraintsBuilder =
+                        CalendarConstraints.Builder()
+                                .setValidator(DateValidatorPointBackward.now())
+                val picker =
+                        MaterialDatePicker.Builder.datePicker()
+                                .setTitleText(R.string.birth)
+                                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                                .setCalendarConstraints(constraintsBuilder.build())
+                                .build()
+
+                picker.addOnPositiveButtonClickListener { birth: Long ->
+                    this.birth = birth
+                    val birthStr = Date(birth)
+                    val format = SimpleDateFormat("dd.MM.yyyy")
+                    birthInput.setText(format.format(birthStr))
+                }
+
+                fragmentManager?.let { it1 -> picker.show(it1, "birthPicker") }
+                birthInput.isActivated = false
+                birthInput.clearFocus()
+            }
+        }
 
         butUpdate.setOnClickListener {
             changeData()
@@ -73,16 +112,13 @@ class Settings : Fragment() {
         val intent = Intent(activity, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-//        val action = SettingsDirections.actionSettingsToLoginActivity()
-//        action.
-//        findNavController().navigate(action)
     }
 
     @SuppressLint("NewApi")
     private fun uiEnabled(status: Boolean){
             nameInput.isEnabled = status
             phoneInput.isEnabled = status
-            ageInput.isEnabled = status
+            birthInput.isEnabled = status
             descInput.isEnabled = status
             cityInput.isEnabled = status
     }
@@ -98,15 +134,19 @@ class Settings : Fragment() {
     private fun updateData(){
         butUpdate.isEnabled = false
         uiEnabled(false)
-        DBHelper.fillUserData(nameInput.text.toString(), User.email, phoneInput.text.toString(), ageInput.text.toString().toInt(), descInput.text.toString(), cityInput.text.toString(), ::onDataChanged)
+        DBHelper.fillUserData(nameInput.text.toString(), User.email, phoneInput.text.toString(), birth, descInput.text.toString(), cityInput.text.toString(), ::onDataChanged)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun onDataChanged(result: Boolean){
         butUpdate.isEnabled = true
         if(result){
             User.name = nameInput.text.toString()
             User.phone = phoneInput.text.toString()
-            User.age = ageInput.text.toString().toInt()
+            val instant = Instant.ofEpochMilli(User.birth!!)
+            var dateSnap = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+            var nowSnap = ZonedDateTime.now()
+            User.age = nowSnap.year - dateSnap.year
             User.city = cityInput.text.toString()
             User.description = descInput.text.toString()
             butUpdate.text = "Change"

@@ -8,7 +8,7 @@
     <string name="warning_verificate_account">Please verificate account\nLetter sent to your email</string>
     <string name="warning_email">Incorrect email</string>
     <string name="warning_name">Incorrect name</string>
-    <string name="warning_age">Incorrect age</string>
+    <string name="warning_birth">Incorrect date</string>
     <string name="warning_age_limit">You must be at least 14 for registration</string>
     <string name="warning_phone">Incorrect phone</string>
     <string name="warning_phone_size">At least 11 digits</string>
@@ -32,4 +32,9 @@
     <string name="event_edited">Event was changed</string>
     <string name="event_created_error">Failed to create a new event</string>
     <string name="event_edited_error">Failed to change an event</string>
+    <string name="participants_list">Participants</string>
+    <string name="kick_participant">Kick %1$s from the event?</string>
+    <string name="participant_kicked">User was kicked</string>
+    <string name="failed_to_kick_participant">Failed to kick the participant</string>
+    <string name="birth">Date of birth</string>
 </resources>

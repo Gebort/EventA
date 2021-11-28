@@ -1,6 +1,8 @@
 package com.example.eventa
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.example.eventa.viewModels.allEventsViewModel
 import com.example.eventa.viewModels.followedEventsViewModel
 import com.example.eventa.viewModels.orgEventsViewModel
@@ -8,6 +10,10 @@ import com.google.firebase.firestore.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import org.w3c.dom.Document
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.reflect.KFunction1
 
@@ -18,6 +24,7 @@ object DBHelper {
     var orgEventsListener: ListenerRegistration? = null
     val events = "events"
 
+     @RequiresApi(Build.VERSION_CODES.O)
      fun emailCheck(
              email: String,
              callback: (Boolean) -> Unit)
@@ -30,9 +37,13 @@ object DBHelper {
                          User.name = result.get("name").toString()
                          User.email = email
                          User.phone = result.get("phone").toString()
-                         User.age = result.get("age").toString().toInt()
+                         User.birth = result.get("birth").toString().toLong()
                          User.description = result.get("desc").toString()
                          User.city = result.get("city").toString()
+                         val instant = Instant.ofEpochMilli(User.birth!!)
+                         var dateSnap = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
+                         var nowSnap = ZonedDateTime.now()
+                         User.age = nowSnap.year - dateSnap.year
                          callback(true)
                      }
                      else{
@@ -49,7 +60,7 @@ object DBHelper {
             name: String,
             email: String,
             phone: String,
-            age: Int,
+            birth: Long,
             desc: String,
             city: String,
             callback: (Boolean) -> Unit)
@@ -58,7 +69,7 @@ object DBHelper {
         val docData = hashMapOf(
                 "name" to name,
                 "phone" to phone,
-                "age" to age,
+                "birth" to birth,
                 "desc" to desc,
                 "city" to city
         )
@@ -150,12 +161,14 @@ object DBHelper {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun loadAvalEvents(city: String?, count: Long, callback: (Event, allEventsViewModel.Types) -> Unit) {
         val db = Firebase.firestore
 
         avalEventsListener?.remove()
+        val now = ZonedDateTime.now(ZoneOffset.UTC)
 
-        avalEventsListener = db.collection(events).whereEqualTo("city", city).orderBy("date").limit(count)
+        avalEventsListener = db.collection(events).whereEqualTo("city", city).whereGreaterThan("date", now.toEpochSecond()*1000).orderBy("date").limit(count)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load aval events: $error")
@@ -164,7 +177,6 @@ object DBHelper {
                             for (doc in value.documentChanges) {
                                 val event = doc.document.toObject(Event::class.java)
                                     event.id = doc.document.id
-                                    event.city = User.city.toLowerCase(Locale.ROOT)
                                     if (event.users == null) {
                                         event.users = listOf()
                                     }
@@ -185,12 +197,14 @@ object DBHelper {
                 }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun loadOrganisedEvents(email: String, callback: (Event, Int, orgEventsViewModel.Types) -> Unit){
         val db = Firebase.firestore
 
         orgEventsListener?.remove()
+        val now = ZonedDateTime.now(ZoneOffset.UTC)
 
-        orgEventsListener = db.collection(events).whereEqualTo("orgEmail", email).orderBy("date")
+        orgEventsListener = db.collection(events).whereEqualTo("orgEmail", email).whereGreaterThan("date", now.toEpochSecond()*1000).orderBy("date")
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load organised events: $error")
@@ -200,7 +214,6 @@ object DBHelper {
                             for (doc in value.documentChanges) {
                                 val event = doc.document.toObject(Event::class.java)
                                 event.id = doc.document.id
-                                event.city = User.city.toLowerCase(Locale.ROOT)
                                 if (event.users == null) {
                                     event.users = listOf()
                                 }
@@ -222,12 +235,14 @@ object DBHelper {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun loadFollowedEvents(email: String, callback: (Event, Int, followedEventsViewModel.Types) -> Unit){
         val db = Firebase.firestore
 
         followedEventsListener?.remove()
+        val now = ZonedDateTime.now(ZoneOffset.UTC)
 
-        followedEventsListener = db.collection(events).whereArrayContains("users", email).orderBy("date")
+        followedEventsListener = db.collection(events).whereArrayContains("users", email).whereGreaterThan("date", now.toEpochSecond()*1000).orderBy("date")
                 .addSnapshotListener { value, error ->
                     if (error != null){
                         Log.d("DBHelper", "Failed to load followed events: $error")
@@ -237,7 +252,6 @@ object DBHelper {
                             for (doc in value.documentChanges) {
                                 val event = doc.document.toObject(Event::class.java)
                                 event.id = doc.document.id
-                                event.city = User.city.toLowerCase(Locale.ROOT)
                                 if (event.users == null) {
                                     event.users = listOf()
                                 }

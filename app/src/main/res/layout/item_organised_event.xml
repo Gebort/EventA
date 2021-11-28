@@ -189,6 +189,16 @@
                 app:layout_constraintTop_toBottomOf="@+id/imageView13"
                 app:srcCompat="@drawable/participants_icon" />
 
+            <Button
+                android:id="@+id/partBut"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/participants_list"
+                app:layout_constraintBottom_toBottomOf="@+id/numberText"
+                app:layout_constraintStart_toEndOf="@+id/numberText"
+                app:layout_constraintTop_toTopOf="@+id/numberText" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView

@@ -6,15 +6,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.eventa.DBHelper
 import com.example.eventa.Event
+import com.example.eventa.User
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class allEventsViewModel : ViewModel() {
     var email = ""
     var city: String? = ""
-    var age = -1
+    var age: Int = -1
 
     var eventIncrement = 5
     var eventMin = 20

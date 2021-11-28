@@ -41,6 +41,7 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
         var extraLayout: ConstraintLayout?
         var edit: Button?
         var delete: Button?
+        var partBut: Button?
 
         init {
             title = iv.findViewById(R.id.titleText)
@@ -55,6 +56,7 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
             extraLayout = iv.findViewById(R.id.layoutExtra)
             edit = iv.findViewById(R.id.editBut)
             delete = iv.findViewById(R.id.deleteBut)
+            partBut = iv.findViewById(R.id.partBut)
         }
     }
 
@@ -74,11 +76,22 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
         val timeStr = DateTimeFormatter.ofPattern("HH.mm").format(dateSnap)
         h.date?.text = dateStr
         h.desc?.text = events[i].desc
-        h.loc?.text = events[i].loc
+        if (events[i]!!.city != null){
+            h.loc?.text = "${events[i]!!.city}, ${events[i]!!.loc}"
+        }
+        else{
+            h.loc?.text = events[i]!!.loc
+        }
         h.number?.text = "${events[i].currPartNumber}/${events[i].partNumber}"
         h.time?.text = timeStr
         h.orgName?.text = "Organisator - ${events[i].orgName}"
         h.title?.text = events[i].title
+        h.partBut?.isEnabled = false
+        if (events[i].users != null){
+            if (events[i].users!!.isNotEmpty()){
+                h.partBut?.isEnabled = true
+            }
+        }
 
         if(events[i].showEmail){
             h.orgEmail?.text = "Email - ${events[i].orgEmail}"
@@ -111,7 +124,30 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
             notifyItemChanged(mExpandedPosition)
         }
 
-        //TODO возможность просмотреть список участников и информацию о них
+        h.partBut?.setOnClickListener {
+            if (events[i].users != null) {
+                val items = events[i].users?.toTypedArray()
+                MaterialAlertDialogBuilder(rView.context)
+                        .setTitle(R.string.participants_list)
+                        .setItems(items) { _, which ->
+                            MaterialAlertDialogBuilder(rView.context)
+                                    .setMessage(String.format(rView.context.resources.getString(R.string.kick_participant), items?.get(which)))
+                                    .setNegativeButton("Cancel"){ dialog, _ ->
+                                        dialog.cancel()
+                                    }
+                                    .setPositiveButton("Yes"){ _, _ ->
+                                        DBHelper.removeParticipant(events[i].id.toString(), items?.get(which)!!){ result ->
+                                            onRemoveResult(result)
+                                        }
+                                    }
+                                    .setOnCancelListener{
+                                        h.delete?.isEnabled = true
+                                    }
+                                    .show()
+                        }
+                        .show()
+            }
+        }
 
         h.edit?.setOnClickListener {
             h.edit?.isEnabled = false
@@ -156,6 +192,17 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
         else{
             Snackbar.make(rView, R.string.event_not_deleted, Snackbar.LENGTH_SHORT)
                 .show()
+        }
+    }
+
+    private fun onRemoveResult(result: Boolean){
+        if (result) {
+            Snackbar.make(rView, R.string.participant_kicked, Snackbar.LENGTH_SHORT).setAnchorView(rView)
+                    .show()
+        }
+        else{
+            Snackbar.make(rView, R.string.failed_to_kick_participant, Snackbar.LENGTH_SHORT)
+                    .show()
         }
     }
 
