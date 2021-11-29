@@ -1,10 +1,12 @@
 package com.example.eventa.mainFragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,6 +32,7 @@ class OrginisedEvents : Fragment() {
     private var adapter: orgEventsAdapter? = null
     private lateinit var model: orgEventsViewModel
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,7 +71,7 @@ class OrginisedEvents : Fragment() {
         activity?.let {
             model.getEvents().observe(it, { events ->
                 adapter!!.events = events
-                onEventsResult(model.change, model.pos)
+                onEventsResult(model.change, model.newPos, model.oldPos)
             })
         }
 
@@ -79,6 +82,7 @@ class OrginisedEvents : Fragment() {
         return i
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updateData(){
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
@@ -86,7 +90,7 @@ class OrginisedEvents : Fragment() {
         model.loadOrgEvents()
     }
 
-    fun onEventsResult(type: orgEventsViewModel.Types, pos: Int) {
+    fun onEventsResult(type: orgEventsViewModel.Types, newPos: Int, oldPos: Int) {
         prBar.visibility = View.INVISIBLE
         prBar.isEnabled = false
         if (adapter!!.events.isEmpty())
@@ -97,15 +101,21 @@ class OrginisedEvents : Fragment() {
 
         when (type) {
             orgEventsViewModel.Types.ADDED -> {
-                adapter!!.notifyItemInserted(pos)
+                adapter!!.notifyItemInserted(newPos)
             }
             orgEventsViewModel.Types.MODIFIED -> {
-                adapter!!.notifyItemChanged(pos)
+                if (oldPos == newPos){
+                    adapter!!.notifyItemChanged(oldPos)
+                }
+                else{
+                    adapter!!.notifyItemRemoved(oldPos)
+                    adapter!!.notifyItemInserted(newPos)
+                }
             }
             orgEventsViewModel.Types.REMOVED -> {
                 adapter!!.previousExpandedPosition = adapter!!.noSelected
                 adapter!!.mExpandedPosition = adapter!!.noSelected
-                adapter!!.notifyItemRemoved(pos)
+                adapter!!.notifyItemRemoved(oldPos)
             }
             orgEventsViewModel.Types.CLEARED -> {
                 adapter!!.notifyDataSetChanged()

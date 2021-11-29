@@ -198,7 +198,7 @@ object DBHelper {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun loadOrganisedEvents(email: String, callback: (Event, Int, orgEventsViewModel.Types) -> Unit){
+    fun loadOrganisedEvents(email: String, callback: (Event, Int, Int, orgEventsViewModel.Types) -> Unit){
         val db = Firebase.firestore
 
         orgEventsListener?.remove()
@@ -219,13 +219,13 @@ object DBHelper {
                                 }
                                 when (doc.type) {
                                     DocumentChange.Type.ADDED -> {
-                                        callback(event, doc.newIndex , orgEventsViewModel.Types.ADDED)
+                                        callback(event, doc.newIndex , doc.oldIndex, orgEventsViewModel.Types.ADDED)
                                     }
                                     DocumentChange.Type.MODIFIED -> {
-                                        callback(event, doc.newIndex, orgEventsViewModel.Types.MODIFIED)
+                                        callback(event, doc.newIndex, doc.oldIndex, orgEventsViewModel.Types.MODIFIED)
                                     }
                                     DocumentChange.Type.REMOVED -> {
-                                        callback(event, doc.oldIndex, orgEventsViewModel.Types.REMOVED)
+                                        callback(event, doc.oldIndex, doc.oldIndex, orgEventsViewModel.Types.REMOVED)
                                     }
                                 }
                             }
@@ -236,7 +236,7 @@ object DBHelper {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun loadFollowedEvents(email: String, callback: (Event, Int, followedEventsViewModel.Types) -> Unit){
+    fun loadFollowedEvents(email: String, callback: (Event, Int, Int, followedEventsViewModel.Types) -> Unit){
         val db = Firebase.firestore
 
         followedEventsListener?.remove()
@@ -257,13 +257,13 @@ object DBHelper {
                                 }
                                 when (doc.type) {
                                     DocumentChange.Type.ADDED -> {
-                                        callback(event, doc.newIndex , followedEventsViewModel.Types.ADDED)
+                                        callback(event, doc.newIndex, doc.oldIndex, followedEventsViewModel.Types.ADDED)
                                     }
                                     DocumentChange.Type.MODIFIED -> {
-                                        callback(event, doc.newIndex, followedEventsViewModel.Types.MODIFIED)
+                                        callback(event, doc.newIndex, doc.oldIndex, followedEventsViewModel.Types.MODIFIED)
                                     }
                                     DocumentChange.Type.REMOVED -> {
-                                        callback(event, doc.oldIndex, followedEventsViewModel.Types.REMOVED)
+                                        callback(event, doc.oldIndex, doc.oldIndex, followedEventsViewModel.Types.REMOVED)
                                     }
                                 }
                             }

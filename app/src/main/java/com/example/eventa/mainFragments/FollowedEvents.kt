@@ -1,11 +1,13 @@
 package com.example.eventa.mainFragments
 
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -31,6 +33,7 @@ class FollowedEvents : Fragment() {
     private var adapter: followedEventsAdapter? = null
     private lateinit var model: followedEventsViewModel
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -63,7 +66,7 @@ class FollowedEvents : Fragment() {
         activity?.let {
             model.getEvents().observe(it, { events ->
                 adapter!!.events = events
-                onEventsResult(model.change, model.pos)
+                onEventsResult(model.change, model.newPos, model.oldPos)
             })
         }
 
@@ -74,6 +77,7 @@ class FollowedEvents : Fragment() {
         return i
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updateData(){
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
@@ -81,7 +85,7 @@ class FollowedEvents : Fragment() {
         model.loadFollowedEvents()
     }
 
-    fun onEventsResult(type: followedEventsViewModel.Types, pos: Int) {
+    fun onEventsResult(type: followedEventsViewModel.Types, newPos: Int, oldPos: Int) {
         prBar.visibility = View.INVISIBLE
         prBar.isEnabled = false
         if (adapter!!.events.isEmpty())
@@ -92,13 +96,19 @@ class FollowedEvents : Fragment() {
 
         when (type) {
             followedEventsViewModel.Types.ADDED -> {
-                adapter!!.notifyItemInserted(pos)
+                adapter!!.notifyItemInserted(newPos)
             }
             followedEventsViewModel.Types.MODIFIED -> {
-                adapter!!.notifyItemChanged(pos)
+                if (oldPos == newPos) {
+                    adapter!!.notifyItemChanged(newPos)
+                }
+                else{
+                    adapter!!.notifyItemRemoved(oldPos)
+                    adapter!!.notifyItemInserted(newPos)
+                }
             }
             followedEventsViewModel.Types.REMOVED -> {
-                adapter!!.notifyItemRemoved(pos)
+                adapter!!.notifyItemRemoved(oldPos)
             }
             followedEventsViewModel.Types.CLEARED -> {
                 adapter!!.notifyDataSetChanged()

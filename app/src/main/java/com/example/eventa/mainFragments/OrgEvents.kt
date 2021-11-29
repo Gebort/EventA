@@ -139,10 +139,11 @@ class OrgEvents : Fragment() {
                 val constraintsBuilder =
                         CalendarConstraints.Builder()
                                 .setValidator(DateValidatorPointForward.now())
+                val selection = if (!edit) MaterialDatePicker.todayInUtcMilliseconds() else eventToChange?.date
                 val picker =
                         MaterialDatePicker.Builder.datePicker()
                                 .setTitleText("Select your event date")
-                                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                                .setSelection(selection)
                                 .setCalendarConstraints(constraintsBuilder.build())
                                 .build()
 

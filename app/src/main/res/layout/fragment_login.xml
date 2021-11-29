@@ -15,10 +15,12 @@
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:gravity="center"
             android:text="Send again"
             app:layout_constraintBottom_toTopOf="@+id/loginLayout"
             app:layout_constraintEnd_toEndOf="@+id/loginLayout"
+            app:layout_constraintHorizontal_bias="0.509"
             app:layout_constraintStart_toStartOf="@+id/loginLayout" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -120,17 +122,6 @@
 
         </LinearLayout>
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/passwordLayout"
-            app:layout_constraintEnd_toEndOf="@+id/loginLayout"
-            app:layout_constraintStart_toStartOf="@+id/loginLayout"
-            app:layout_constraintTop_toTopOf="@+id/loginLayout" />
-
         <TextView
             android:id="@+id/warningText"
             style="@style/Widget.AppCompat.TextView"
@@ -166,6 +157,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

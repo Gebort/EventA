@@ -1,6 +1,8 @@
 package com.example.eventa.viewModels
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +16,8 @@ class followedEventsViewModel : ViewModel() {
     private val events = MutableLiveData<MutableList<Event>>()
     enum class Types {ADDED, MODIFIED, REMOVED, CLEARED}
     var change = Types.CLEARED
-    var pos: Int = -1
+    var newPos = -1
+    var oldPos = -1
 
     init{
         events.value = mutableListOf()
@@ -24,12 +27,13 @@ class followedEventsViewModel : ViewModel() {
         return events
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun loadFollowedEvents() {
         if (email != "") {
             change = Types.CLEARED
             events.value = mutableListOf()
-            DBHelper.loadFollowedEvents(email){ event, pos, type ->
-                onOrgEventsResult(event, pos, type)
+            DBHelper.loadFollowedEvents(email){ event, newPos, oldPos, type ->
+                onOrgEventsResult(event, newPos, oldPos, type)
             }
         }
         else {
@@ -37,26 +41,27 @@ class followedEventsViewModel : ViewModel() {
         }
     }
 
-    private fun onOrgEventsResult(event: Event, pos: Int, type: Types) {
+    private fun onOrgEventsResult(event: Event, newPos: Int,  oldPos: Int ,type: Types) {
         change = type
-        this.pos = pos
+        this.newPos = newPos
+        this.oldPos = oldPos
 
         when (change) {
             Types.ADDED -> {
-                if (pos >= events.value!!.size) {
+                if (newPos >= events.value!!.size) {
                     events.value!!.add(event)
                 }
                 else{
-                    events.value!!.add(pos, event)
+                    events.value!!.add(newPos, event)
                 }
                 events.value = events.value
             }
             Types.MODIFIED -> {
-                events.value!![pos] = event
+                events.value!![newPos] = event
                 events.value = events.value
             }
             Types.REMOVED -> {
-                events.value!!.removeAt(pos)
+                events.value!!.removeAt(oldPos)
                 events.value = events.value
             }
         }
