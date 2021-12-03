@@ -127,6 +127,7 @@ class AllEvents : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         val search = menu.findItem(R.id.action_search)
+        search.isVisible = true
         val searchView = search.actionView as SearchView?
         searchView?.queryHint = "Search by title or id..."
         searchView?.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
@@ -147,19 +148,6 @@ class AllEvents : Fragment() {
             }
         })
         super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId){
-            R.id.action_search -> {
-
-            }
-            R.id.action_more -> {
-
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

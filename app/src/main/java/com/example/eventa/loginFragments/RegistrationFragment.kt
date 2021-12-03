@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -160,6 +161,7 @@ class RegistrationFragment : Fragment() {
                                 } else {
                                     loadingBar(false)
                                     warningText.text = getString(R.string.warning_registration_failed)
+                                    warningText.isVisible = true
                                 }
                             }
                 } else {
@@ -191,10 +193,12 @@ class RegistrationFragment : Fragment() {
             User.email = email
             User.name = name
             User.phone = phone
+            warningText.isVisible = false
             toLoginFragment()
         }
         else{
             loadingBar(false)
+            warningText.isVisible = true
             warningText.text = getString(R.string.warning_registration_failed)
         }
     }

@@ -73,6 +73,15 @@ class followedEventsViewModel : ViewModel() {
         sharedPreferences?.edit()?.remove(events.value!![index].id)?.apply()
     }
 
+    fun rewriteNotificationRecords(){
+        sharedPreferences?.edit()?.clear()?.commit()
+        val editor = sharedPreferences?.edit()
+        events.value!!.forEach {
+            editor?.putLong(it.id!!, it.lastUpdate)
+        }
+        editor?.commit()
+    }
+
     fun itemExpanded(index: Int){
         if (events.value!![index].notification){
             removeNotification(index)

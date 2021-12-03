@@ -1,9 +1,11 @@
 package com.example.eventa.mainFragments
 
+import android.app.ActionBar
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
+import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +58,7 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.all_events_icon, menu)
         val search = menu.findItem(R.id.action_search)
         val searchView = SearchView(this)
+
         search.actionView = searchView
         search.expandActionView()
         return super.onCreateOptionsMenu(menu)

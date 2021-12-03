@@ -1,10 +1,10 @@
 package com.example.eventa.mainFragments
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.example.eventa.R
@@ -43,6 +43,16 @@ class MyEvents : Fragment() {
         }.attach()
 
         return i
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.findItem(R.id.action_search).isVisible = false
+        super.onPrepareOptionsMenu(menu)
     }
 
 }

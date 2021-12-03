@@ -5,7 +5,7 @@
     <string name="warning_invalid_login">Invalid</string>
     <string name="warning_google_signin_failed">Unable to login</string>
     <string name="warning_failed_to_change_data">Failed to change data</string>
-    <string name="warning_verificate_account">Please verificate account\nLetter sent to your email</string>
+    <string name="warning_verificate_account">Please verificate your account\nLetter sent to your email</string>
     <string name="warning_email">Incorrect email</string>
     <string name="warning_name">Incorrect name</string>
     <string name="warning_birth">Incorrect date</string>

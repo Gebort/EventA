@@ -102,7 +102,7 @@ class LoginFragment : Fragment() {
                 email?.let { DBHelper.emailCheck(it, ::onEmailCheckResultAuto) }
             }
             else {
-                loadingBar(true)
+                loadingBar(false)
                 warningText.visibility = View.VISIBLE
                 warningText.text = getString(R.string.warning_verificate_account)
                 sendVerifyBut.visibility = View.VISIBLE

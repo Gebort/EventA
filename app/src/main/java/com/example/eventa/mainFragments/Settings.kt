@@ -6,9 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -107,6 +105,12 @@ class Settings : Fragment() {
         return i
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        val search = menu.findItem(R.id.action_search)
+        search.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     private fun signOut(){
         User.signout()
         val intent = Intent(activity, LoginActivity::class.java)
@@ -161,5 +165,15 @@ class Settings : Fragment() {
             warningText.visibility = View.VISIBLE
             uiEnabled(true)
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.findItem(R.id.action_search).isVisible = false
+        super.onPrepareOptionsMenu(menu)
     }
 }
