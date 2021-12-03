@@ -16,5 +16,9 @@ data class Event(
         var orgName: String? = "",
         var orgPhone: String? = "",
         var orgEmail: String? = "",
-        var users: List<String>? = null
+        var users: List<String>? = null,
+        var requests: List<String>? = null,
+        var notification: Boolean = false,
+        var lastUpdate: Long = -1,
+        var today: Boolean = false,
 )

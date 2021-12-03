@@ -5,29 +5,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.eventa.DBHelper
 import com.example.eventa.Event
 import com.example.eventa.R
 import com.example.eventa.User
-import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.util.*
 
-class followedEventsAdapter(var events: List<Event>):
+class followedEventsAdapter(val rView: RecyclerView, var events: List<Event>, val expanded: (Int) -> Unit):
         RecyclerView.Adapter<followedEventsAdapter.MyViewHolder>(){
 
     private var mExpandedPosition = -1
     private var previousExpandedPosition = -1
 
     class MyViewHolder(iv: View) : RecyclerView.ViewHolder(iv){
+        var notificationImage: ImageView?
         var title: TextView?
         var date: TextView?
         var desc: TextView?
+        var lock: ImageView?
         var loc: TextView?
         var time: TextView?
         var number: TextView?
@@ -38,8 +40,10 @@ class followedEventsAdapter(var events: List<Event>):
         var unsign: Button?
 
         init {
+            notificationImage = iv.findViewById(R.id.notificationImage)
             title = iv.findViewById(R.id.titleText)
             date = iv.findViewById(R.id.dateText)
+            lock = iv.findViewById(R.id.lockImage)
             desc = iv.findViewById(R.id.descText)
             loc = iv.findViewById(R.id.locText)
             time = iv.findViewById(R.id.timeText)
@@ -61,13 +65,21 @@ class followedEventsAdapter(var events: List<Event>):
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(h: MyViewHolder, i: Int) {
+        h.notificationImage?.isVisible = events[i].notification
+
         val instant = Instant.ofEpochMilli(events[i]!!.date)
         var dateSnap = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
 
         val dateStr = DateTimeFormatter.ofPattern("dd.MM.yyyy").format(dateSnap)
         val timeStr = DateTimeFormatter.ofPattern("HH.mm").format(dateSnap)
-        h.date?.text = dateStr
         h.desc?.text = events[i].desc
+        h.lock?.isVisible = !events[i].public
+        if (events[i]?.today){
+            h.date?.text = rView.context.resources.getString(R.string.today)
+        }
+        else{
+            h.date?.text = dateStr
+        }
         if (events[i]!!.city != null){
             h.loc?.text = "${events[i]!!.city}, ${events[i]!!.loc}"
         }
@@ -79,7 +91,7 @@ class followedEventsAdapter(var events: List<Event>):
         h.orgName?.text = "Organisator - ${events[i].orgName}"
         h.title?.text = events[i].title
         h.unsign?.isEnabled = true
-        if(events[i].showEmail){
+        if (events[i].showEmail){
             h.orgEmail?.text = "Email - ${events[i].orgEmail}"
             h.orgEmail?.visibility = View.VISIBLE
         }
@@ -87,7 +99,7 @@ class followedEventsAdapter(var events: List<Event>):
             h.orgEmail?.text = ""
             h.orgEmail?.visibility = View.GONE
         }
-        if(events[i].showNumber){
+        if (events[i].showNumber){
             h.orgPhone?.text = "Phone - ${events[i].orgPhone}"
             h.orgPhone?.visibility = View.VISIBLE
         }
@@ -105,9 +117,11 @@ class followedEventsAdapter(var events: List<Event>):
         if (isExpanded) previousExpandedPosition = mExpandedPosition
 
         h.itemView.setOnClickListener{
+            expanded(h.layoutPosition)
             mExpandedPosition = if (isExpanded) -1 else h.layoutPosition
             notifyItemChanged(previousExpandedPosition)
             notifyItemChanged(mExpandedPosition)
+
         }
 
         h.unsign?.setOnClickListener {

@@ -29,6 +29,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="Phone"
             app:counterEnabled="false"
             app:counterMaxLength="15"
@@ -52,6 +53,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:hint="Description"
             app:counterEnabled="false"
             app:counterMaxLength="300"
@@ -120,13 +122,14 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:layout_weight="3"
             android:hint="@string/birth"
             app:errorEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cityLayout"
-            app:startIconDrawable="@drawable/calendar_icon">
+            app:startIconDrawable="@drawable/calendar_icon_vector">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/birthInput"
@@ -141,6 +144,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:layout_weight="1"
             android:hint="City"
             app:counterEnabled="false"

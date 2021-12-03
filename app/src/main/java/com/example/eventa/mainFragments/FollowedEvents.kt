@@ -10,18 +10,12 @@ import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.eventa.Event
 import com.example.eventa.R
 import com.example.eventa.User
-import com.example.eventa.recyclerViews.allEventsAdapter
 import com.example.eventa.recyclerViews.followedEventsAdapter
-import com.example.eventa.recyclerViews.orgEventsAdapter
-import com.example.eventa.viewModels.allEventsViewModel
 import com.example.eventa.viewModels.followedEventsViewModel
 
 class FollowedEvents : Fragment() {
@@ -56,10 +50,13 @@ class FollowedEvents : Fragment() {
         rView.layoutManager = LinearLayoutManager(activity?.applicationContext)
 
         val modelN: followedEventsViewModel by activityViewModels()
+
         model = modelN
 
         if(adapter == null){
-            adapter = followedEventsAdapter(model.getEvents().value!!)
+            adapter = followedEventsAdapter(rView, model.getEvents().value!!){ index ->
+                onItemExpanded(index)
+            }
             rView.adapter = adapter
         }
 
@@ -68,10 +65,6 @@ class FollowedEvents : Fragment() {
                 adapter!!.events = events
                 onEventsResult(model.change, model.newPos, model.oldPos)
             })
-        }
-
-        if (model.email != User.email){
-            updateData()
         }
 
         return i
@@ -114,6 +107,10 @@ class FollowedEvents : Fragment() {
                 adapter!!.notifyDataSetChanged()
             }
         }
+    }
+
+    fun onItemExpanded(index: Int){
+        model.itemExpanded(index)
     }
 
 }

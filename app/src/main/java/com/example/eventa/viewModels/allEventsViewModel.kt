@@ -1,6 +1,8 @@
 package com.example.eventa.viewModels
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 class allEventsViewModel : ViewModel() {
@@ -20,8 +23,8 @@ class allEventsViewModel : ViewModel() {
     var city: String? = ""
     var age: Int = -1
 
-    var eventIncrement = 5
-    var eventMin = 20
+    var eventIncrement = 30
+    var eventMin = 30
     var eventCount = eventMin
     var updateDelay = 2000L
     var isDelayLoading = false
@@ -40,6 +43,7 @@ class allEventsViewModel : ViewModel() {
         return events
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @DelicateCoroutinesApi
     fun loadAllEvents(clear: Boolean) {
         if(email != "" && city != "" && age != -1) {
@@ -51,12 +55,13 @@ class allEventsViewModel : ViewModel() {
                 onAllEventsResult(event, result)
             }
 
-            delayUpdateCheck()
+          //  delayUpdateCheck()
         }
         else
             Log.d("allEventsViewModel", "No input data, cant load all events")
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @DelicateCoroutinesApi
     private fun onAllEventsResult(event: Event, type: Types){
         val e = events.value!!.firstOrNull { it.id == event.id }
@@ -67,13 +72,14 @@ class allEventsViewModel : ViewModel() {
                 change = Types.ADDED
             }
             else{
-                if ((event.users != null && event.users!!.contains(email)) ||
+                change = if (
+                        (event.users != null && event.users!!.contains(email)) ||
+                        (event.requests != null && event.requests!!.contains(email)) ||
                         event.currPartNumber >= event.partNumber ||
                         event.minAge > age) {
-                    change = Types.REMOVED
-                }
-                else{
-                    change = Types.MODIFIED
+                    Types.REMOVED
+                } else{
+                    Types.MODIFIED
                 }
             }
         }
@@ -81,12 +87,23 @@ class allEventsViewModel : ViewModel() {
         when (change) {
             Types.ADDED -> {
                 if(e == null) {
-                    if (event.orgEmail!! != email && (event.users == null || !event.users!!.contains(email)) &&
+                    if (
+                            event.orgEmail!! != email &&
+                            (event.users == null || !event.users!!.contains(email)) &&
+                            (event.requests == null || !event.requests!!.contains(email)) &&
                             event.currPartNumber < event.partNumber &&
                             event.minAge <= age) {
+
                         events.value!!.add(event)
                         val newEvents = events.value!!.sortedBy { it.date }.toMutableList()
                         pos = newEvents.indexOf(event)
+                        val dateInstant = Instant.ofEpochMilli(event.date)
+                        var dateSnap = ZonedDateTime.ofInstant(dateInstant, ZoneOffset.UTC)
+                        val nowInstant = Instant.ofEpochMilli(System.currentTimeMillis())
+                        val nowSnap = ZonedDateTime.ofInstant(nowInstant, ZoneOffset.UTC)
+                        if (dateSnap.year == nowSnap.year && dateSnap.month == nowSnap.month && dateSnap.dayOfMonth == nowSnap.dayOfMonth) {
+                            event.today = true
+                        }
                         events.value = newEvents
                     }
                 }
@@ -105,10 +122,12 @@ class allEventsViewModel : ViewModel() {
             }
         }
 
-        delayUpdateCheck()
+//        delayUpdateCheck()
 
     }
 
+    //TODO отключена проверка
+    @RequiresApi(Build.VERSION_CODES.O)
     @DelicateCoroutinesApi
     private fun delayUpdateCheck(){
         if (!isDelayLoading && events.value!!.size < eventMin) {

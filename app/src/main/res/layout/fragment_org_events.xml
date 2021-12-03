@@ -113,7 +113,7 @@
                         android:layout_weight="1"
                         android:hint="Date"
                         app:errorEnabled="true"
-                        app:startIconDrawable="@drawable/calendar_icon">
+                        app:startIconDrawable="@drawable/calendar_icon_vector">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/datePickerInput"

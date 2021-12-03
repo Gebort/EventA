@@ -37,4 +37,11 @@
     <string name="participant_kicked">User was kicked</string>
     <string name="failed_to_kick_participant">Failed to kick the participant</string>
     <string name="birth">Date of birth</string>
+    <string name="today">Today</string>
+    <string name="leave_a_request">This event is private. Leave a request to participate.</string>
+    <string name="requests">Requests</string>
+    <string name="requests_list">Requests list</string>
+    <string name="add_participant">Add %1$s to the event?</string>
+    <string name="participant_added">User was added</string>
+    <string name="failed_to_add_participant">Failed to add the participant</string>
 </resources>

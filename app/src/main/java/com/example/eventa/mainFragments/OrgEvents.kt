@@ -233,12 +233,16 @@ class OrgEvents : Fragment() {
 
                 val dateSnapLocal = date + LocalTime.of(hour, min).toSecondOfDay()*1000
                 val dateSnapUTC = dateSnapLocal - TimeZone.getDefault().rawOffset - TimeZone.getDefault().dstSavings
+                val dateUpdateUTC = System.currentTimeMillis()
+
+                val users = if (edit) eventToChange!!.users ?: listOf() else listOf()
+                val requests = if (edit) eventToChange!!.requests ?: listOf() else listOf()
 
                 val event = Event(
                         eventToChange?.id,
                         eventInput.text.toString(),
                         partNumbInput.text.toString().toInt(),
-                        0,
+                        users.size,
                         ageInput.text.toString().toInt(),
                         dateSnapUTC,
                         descInput.text.toString(),
@@ -249,7 +253,11 @@ class OrgEvents : Fragment() {
                         phoneSwitch.isChecked,
                         User.name,
                         User.phone,
-                        User.email
+                        User.email,
+                        users,
+                        requests,
+                        false,
+                        dateUpdateUTC
                 )
 
                 if (edit){

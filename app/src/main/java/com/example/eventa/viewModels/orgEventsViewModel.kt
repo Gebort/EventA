@@ -9,6 +9,9 @@ import androidx.lifecycle.ViewModel
 import com.example.eventa.DBHelper
 import com.example.eventa.Event
 import com.example.eventa.User
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 
 class orgEventsViewModel : ViewModel() {
     var email: String = ""
@@ -40,6 +43,18 @@ class orgEventsViewModel : ViewModel() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun checkToday(event: Event, index: Int) {
+        val dateInstant = Instant.ofEpochMilli(event.date)
+        var dateSnap = ZonedDateTime.ofInstant(dateInstant, ZoneOffset.UTC)
+        val nowInstant = Instant.ofEpochMilli(System.currentTimeMillis())
+        val nowSnap = ZonedDateTime.ofInstant(nowInstant, ZoneOffset.UTC)
+        if (dateSnap.year == nowSnap.year && dateSnap.month == nowSnap.month && dateSnap.dayOfMonth == nowSnap.dayOfMonth) {
+            event.today = true
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun onOrgEventsResult(event: Event, newPos: Int, oldPos: Int, type: Types) {
         change = type
         this.newPos = newPos
@@ -53,10 +68,18 @@ class orgEventsViewModel : ViewModel() {
                 else{
                     events.value!!.add(newPos, event)
                 }
+                checkToday(event, newPos)
                 events.value = events.value
             }
             Types.MODIFIED -> {
-                events.value!![newPos] = event
+                if (newPos == oldPos){
+                    events.value!![newPos] = event
+                }
+                else{
+                    events.value!!.removeAt(oldPos)
+                    events.value!!.add(newPos, event)
+                }
+                checkToday(event, newPos)
                 events.value = events.value
             }
             Types.REMOVED -> {

@@ -97,12 +97,15 @@ object DBHelper {
                 "date" to event.date,
                 "city" to event.city,
                 "loc" to event.loc,
+                "users" to event.users,
+                "requests" to event.requests,
                 "public" to event.public,
                 "showEmail" to event.showEmail,
                 "showNumber" to event.showNumber,
                 "orgName" to event.orgName,
                 "orgPhone" to event.orgPhone,
-                "orgEmail" to event.orgEmail
+                "orgEmail" to event.orgEmail,
+                "lastUpdate" to event.lastUpdate
         )
 
         db.collection(events).add(docData)
@@ -127,12 +130,15 @@ object DBHelper {
                 "date" to event.date,
                 "city" to event.city,
                 "loc" to event.loc,
+                "users" to event.users,
+                "requests" to event.requests,
                 "public" to event.public,
                 "showEmail" to event.showEmail,
                 "showNumber" to event.showNumber,
                 "orgName" to event.orgName,
                 "orgPhone" to event.orgPhone,
-                "orgEmail" to event.orgEmail
+                "orgEmail" to event.orgEmail,
+                "lastUpdate" to event.lastUpdate
         )
 
         event.id?.let {
@@ -140,7 +146,7 @@ object DBHelper {
                 .addOnSuccessListener {
                     callback(true)
                 }
-                .addOnSuccessListener {
+                .addOnFailureListener {
                     callback(false)
                 }
         }
@@ -167,18 +173,21 @@ object DBHelper {
 
         avalEventsListener?.remove()
         val now = ZonedDateTime.now(ZoneOffset.UTC)
-
+        
         avalEventsListener = db.collection(events).whereEqualTo("city", city).whereGreaterThan("date", now.toEpochSecond()*1000).orderBy("date").limit(count)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load aval events: $error")
                     } else {
                         if (value != null) {
-                            for (doc in value.documentChanges) {
-                                val event = doc.document.toObject(Event::class.java)
+                                for (doc in value.documentChanges) {
+                                    val event = doc.document.toObject(Event::class.java)
                                     event.id = doc.document.id
                                     if (event.users == null) {
                                         event.users = listOf()
+                                    }
+                                    if (event.requests == null) {
+                                        event.requests = listOf()
                                     }
                                     when (doc.type) {
                                         DocumentChange.Type.ADDED -> {
@@ -190,8 +199,11 @@ object DBHelper {
                                         DocumentChange.Type.REMOVED -> {
                                             callback(event, allEventsViewModel.Types.REMOVED)
                                         }
+                                        else ->{
+                                            val foo = 5
+                                        }
+                                    }
                                 }
-                            }
                         }
                     }
                 }
@@ -293,6 +305,36 @@ object DBHelper {
         db.runBatch { batch ->
             batch.update(db.collection(events).document(id), "users", FieldValue.arrayRemove(email))
             batch.update(db.collection(events).document(id), "currPartNumber", FieldValue.increment(-1))
+        }
+                .addOnSuccessListener {
+                    callback(true)
+                }
+                .addOnFailureListener{
+                    callback(false)
+                }
+    }
+
+    fun addRequest(id: String, email: String, callback: (Boolean) -> Unit){
+        val db = Firebase.firestore
+
+        db.runBatch { batch ->
+            batch.update(db.collection(events).document(id), "requests", FieldValue.arrayUnion(email))
+        }
+                .addOnSuccessListener {
+                    callback(true)
+                }
+                .addOnFailureListener{
+                    callback(false)
+                }
+    }
+
+    fun removeRequestAddParticipant(id: String, email: String, callback: (Boolean) -> Unit){
+        val db = Firebase.firestore
+
+        db.runBatch { batch ->
+            batch.update(db.collection(events).document(id), "requests", FieldValue.arrayRemove(email))
+            batch.update(db.collection(events).document(id), "users", FieldValue.arrayUnion(email))
+            batch.update(db.collection(events).document(id), "currPartNumber", FieldValue.increment(1))
         }
                 .addOnSuccessListener {
                     callback(true)

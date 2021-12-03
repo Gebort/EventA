@@ -1,8 +1,10 @@
 package com.example.eventa.mainFragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -28,6 +30,7 @@ class AllEvents : Fragment() {
     private lateinit var v: View
     private lateinit var model: allEventsViewModel
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -152,6 +155,7 @@ class AllEvents : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateData(city: String){
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
@@ -164,6 +168,7 @@ class AllEvents : Fragment() {
         model.loadAllEvents(true)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onScrollEnd(){
         if (!adapter!!.isLoading) {
             adapter!!.isLoading = true
@@ -174,6 +179,7 @@ class AllEvents : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onEventsResult(type: allEventsViewModel.Types, pos: Int, size: Int) {
         prBar.visibility = View.INVISIBLE
         prBar.isEnabled = false
