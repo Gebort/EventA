@@ -1,6 +1,7 @@
 package com.example.eventa.loginFragments
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import com.example.eventa.DBHelper
@@ -48,6 +50,7 @@ class LoginFragment : Fragment() {
 
     private lateinit var inflate: View
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         inflate = inflater.inflate(R.layout.fragment_login, container, false)

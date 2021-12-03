@@ -7,6 +7,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.compose.ui.text.toLowerCase
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,6 +18,7 @@ import com.example.eventa.R
 import com.example.eventa.User
 import com.example.eventa.recyclerViews.allEventsAdapter
 import com.example.eventa.viewModels.allEventsViewModel
+import java.util.*
 
 
 class AllEvents : Fragment() {
@@ -29,6 +31,7 @@ class AllEvents : Fragment() {
     private var adapter: allEventsAdapter? = null
     private lateinit var v: View
     private lateinit var model: allEventsViewModel
+    val data = arrayOf(User.city, "Global")
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -39,8 +42,6 @@ class AllEvents : Fragment() {
         val i = inflater.inflate(R.layout.fragment_all_events, container, false)
 
         activity?.title = ""
-
-        val data = arrayOf(User.city, "Global")
 
         prBar = i.findViewById(R.id.progressBar)
         prBar.isEnabled = false
@@ -129,8 +130,14 @@ class AllEvents : Fragment() {
         val searchView = search.actionView as SearchView?
         searchView?.queryHint = "Search by title or id..."
         searchView?.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+            @RequiresApi(Build.VERSION_CODES.O)
             override fun onQueryTextSubmit(query: String?): Boolean {
-
+                val keywords = query?.split(" ")?.toTypedArray()?.toMutableList() ?: mutableListOf(" ")
+                keywords.forEachIndexed { index, s ->
+                    keywords[index] = s.toLowerCase()
+                }
+                val city = data[spinner.selectedItemPosition]
+                updateData(city, keywords)
                 return true
             }
 
@@ -156,7 +163,7 @@ class AllEvents : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun updateData(city: String){
+    fun updateData(city: String, keywords: MutableList<String> = mutableListOf(" ")){
         prBar.visibility = View.VISIBLE
         prBar.isEnabled = true
         adapter!!.setLoaded()
@@ -165,7 +172,7 @@ class AllEvents : Fragment() {
         model.age = User.age!!
         model.email = User.email
         model.eventCount = model.eventMin
-        model.loadAllEvents(true)
+        model.loadAllEvents(true, keywords)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

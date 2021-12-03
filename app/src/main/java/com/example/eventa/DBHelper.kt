@@ -88,6 +88,12 @@ object DBHelper {
     {
         val db = Firebase.firestore
 
+        val keywords = event.title?.split(" ")?.toTypedArray()?.toMutableList()
+        keywords?.forEachIndexed { index, s ->
+            keywords[index] = s.toLowerCase()
+        }
+        keywords?.add(" ")
+
         val docData = hashMapOf(
                 "title" to event.title,
                 "partNumber" to event.partNumber,
@@ -105,7 +111,8 @@ object DBHelper {
                 "orgName" to event.orgName,
                 "orgPhone" to event.orgPhone,
                 "orgEmail" to event.orgEmail,
-                "lastUpdate" to event.lastUpdate
+                "lastUpdate" to event.lastUpdate,
+                "keywords" to keywords
         )
 
         db.collection(events).add(docData)
@@ -121,6 +128,12 @@ object DBHelper {
     fun updateEventData(event: Event, callback: (Boolean) -> Unit )   {
         val db = Firebase.firestore
 
+        val keywords = event.title?.split(" ")?.toTypedArray()?.toMutableList()
+        keywords?.forEachIndexed { index, s ->
+            keywords[index] = s.toLowerCase()
+        }
+        keywords?.add(" ")
+
         val docData = hashMapOf(
                 "title" to event.title,
                 "partNumber" to event.partNumber,
@@ -138,7 +151,8 @@ object DBHelper {
                 "orgName" to event.orgName,
                 "orgPhone" to event.orgPhone,
                 "orgEmail" to event.orgEmail,
-                "lastUpdate" to event.lastUpdate
+                "lastUpdate" to event.lastUpdate,
+                "keywords" to keywords
         )
 
         event.id?.let {
@@ -168,13 +182,13 @@ object DBHelper {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun loadAvalEvents(city: String?, count: Long, callback: (Event, allEventsViewModel.Types) -> Unit) {
+    fun loadAvalEvents(city: String?, count: Long, keywords: MutableList<String>, callback: (Event, allEventsViewModel.Types) -> Unit) {
         val db = Firebase.firestore
 
         avalEventsListener?.remove()
         val now = ZonedDateTime.now(ZoneOffset.UTC)
         
-        avalEventsListener = db.collection(events).whereEqualTo("city", city).whereGreaterThan("date", now.toEpochSecond()*1000).orderBy("date").limit(count)
+        avalEventsListener = db.collection(events).whereEqualTo("city", city).whereArrayContainsAny("keywords", keywords).whereGreaterThan("date", now.toEpochSecond()*1000).orderBy("date").limit(count)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
                         Log.d("DBHelper", "Failed to load aval events: $error")

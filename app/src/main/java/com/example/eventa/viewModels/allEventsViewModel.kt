@@ -3,6 +3,7 @@ package com.example.eventa.viewModels
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.key
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -45,13 +46,13 @@ class allEventsViewModel : ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @DelicateCoroutinesApi
-    fun loadAllEvents(clear: Boolean) {
+    fun loadAllEvents(clear: Boolean, keywords: MutableList<String> = mutableListOf(" ")) {
         if(email != "" && city != "" && age != -1) {
             if (clear) {
                 change = Types.CLEARED
                 events.value = mutableListOf()
             }
-            DBHelper.loadAvalEvents(city, eventCount.toLong()){ event, result ->
+            DBHelper.loadAvalEvents(city, eventCount.toLong(), keywords){ event, result ->
                 onAllEventsResult(event, result)
             }
 
