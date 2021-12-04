@@ -72,9 +72,9 @@
     <string name="organisator">Организатор - %1$s</string>
     <string name="organisator_phone">Телефон - %1$s</string>
     <string name="organisator_email">Почта - %1$s</string>
-    <string name="event_title">Event title</string>
-    <string name="age">Age</string>
-    <string name="participants">Participants</string>
+    <string name="event_title">Название события</string>
+    <string name="age">Возраст</string>
+    <string name="participants">Участники</string>
     <string name="date">Дата</string>
     <string name="time">Время</string>
     <string name="public_event">Публичное событие</string>
