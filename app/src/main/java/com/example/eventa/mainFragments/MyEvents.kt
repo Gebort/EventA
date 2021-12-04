@@ -26,7 +26,7 @@ class MyEvents : Fragment() {
     ): View? {
         val i = inflater.inflate(R.layout.fragment_my_events, container, false)
 
-        activity?.title = "My events"
+        activity?.title = activity?.resources?.getString(R.string.my_events)
 
         viewPager = i.findViewById(R.id.viewPager)
         tabLayout = i.findViewById(R.id.tabLayout)

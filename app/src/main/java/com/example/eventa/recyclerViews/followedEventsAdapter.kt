@@ -84,15 +84,15 @@ class followedEventsAdapter(val rView: RecyclerView, var events: List<Event>, va
             h.loc?.text = "${events[i]!!.city}, ${events[i]!!.loc}"
         }
         else{
-            h.loc?.text = events[i]!!.loc
+            h.loc?.text = rView.resources.getString(R.string.no_place)
         }
         h.number?.text = "${events[i].currPartNumber}/${events[i].partNumber}"
         h.time?.text = timeStr
-        h.orgName?.text = "Organisator - ${events[i].orgName}"
+        h.orgName?.text = String.format(rView.context.resources.getString(R.string.organisator), events[i].orgName)
         h.title?.text = events[i].title
         h.unsign?.isEnabled = true
         if (events[i].showEmail){
-            h.orgEmail?.text = "Email - ${events[i].orgEmail}"
+            h.orgEmail?.text = String.format(rView.context.resources.getString(R.string.organisator_email), events[i].orgEmail)
             h.orgEmail?.visibility = View.VISIBLE
         }
         else{
@@ -100,7 +100,7 @@ class followedEventsAdapter(val rView: RecyclerView, var events: List<Event>, va
             h.orgEmail?.visibility = View.GONE
         }
         if (events[i].showNumber){
-            h.orgPhone?.text = "Phone - ${events[i].orgPhone}"
+            h.orgPhone?.text = String.format(rView.context.resources.getString(R.string.organisator_phone), events[i].orgPhone)
             h.orgPhone?.visibility = View.VISIBLE
         }
         else{

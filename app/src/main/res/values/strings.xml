@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">EventA</string>
-    <string name="no_place">No physical place</string>
+    <string name="no_place">Internet</string>
+    <string name="physical_place">Has address</string>
+    <string name="location">Location</string>
     <string name="no_city">None</string>
     <string name="warning_invalid_login">Invalid</string>
     <string name="warning_google_signin_failed">Unable to login</string>
@@ -44,7 +46,47 @@
     <string name="add_participant">Add %1$s to the event?</string>
     <string name="participant_added">User was added</string>
     <string name="failed_to_add_participant">Failed to add the participant</string>
-    <string name="title_activity_splashscreen">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_splashscreen" translatable="false">FullscreenActivity</string>
+    <string name="profile">Profile</string>
+    <string name="all_events">Search</string>
+    <string name="my_events">My events</string>
+    <string name="name">Name</string>
+    <string name="phone">Phone number</string>
+    <string name="city">City</string>
+    <string name="desc">Description</string>
+    <string name="change">Change</string>
+    <string name="exit">Exit</string>
+    <string name="tell_about_yourself">Tell us about yourself</string>
+    <string name="email">Email</string>
+    <string name="register">Registration</string>
+    <string name="password">Password</string>
+    <string name="repeat_password">Repeat the password</string>
+    <string name="invalid_login_or_password">Invalid login or password</string>
+    <string name="log_in">Log in</string>
+    <string name="send_again">Send again</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="sign_up">Sign up</string>
+    <string name="unsign">Unsign</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="organisator">Organisator - %1$s</string>
+    <string name="organisator_phone">Phone - %1$s</string>
+    <string name="organisator_email">Email - %1$s</string>
+    <string name="event_title">Event title</string>
+    <string name="age">Age</string>
+    <string name="participants">Participants</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="public_event">Public event</string>
+    <string name="show_my_email">Show my email</string>
+    <string name="show_my_phone">Show my phone</string>
+    <string name="edit_event">Edit the event</string>
+    <string name="add_event">Create new event</string>
+    <string name="pick_date">Event date</string>
+    <string name="pick_time">Event time of start</string>
+    <string name="global">Internet</string>
+    <string name="optional">Optional</string>
+
+
 </resources>

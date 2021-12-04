@@ -6,10 +6,12 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.compose.ui.layout.Layout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.eventa.R

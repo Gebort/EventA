@@ -42,7 +42,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Event title"
+                    android:hint="@string/event_title"
                     app:counterEnabled="true"
                     app:counterMaxLength="30"
                     app:errorEnabled="true">
@@ -67,7 +67,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="4dp"
                         android:layout_weight="1"
-                        android:hint="Age"
+                        android:hint="@string/age"
                         app:errorEnabled="true"
                         app:startIconDrawable="@drawable/age_icon">
 
@@ -86,7 +86,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="4dp"
                         android:layout_weight="1"
-                        android:hint="Participants"
+                        android:hint="@string/participants"
                         app:errorEnabled="true"
                         app:startIconDrawable="@drawable/participants_icon">
 
@@ -111,7 +111,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginRight="4dp"
                         android:layout_weight="1"
-                        android:hint="Date"
+                        android:hint="@string/date"
                         app:errorEnabled="true"
                         app:startIconDrawable="@drawable/calendar_icon_vector">
 
@@ -129,7 +129,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="4dp"
                         android:layout_weight="1"
-                        android:hint="Time"
+                        android:hint="@string/time"
                         app:errorEnabled="true"
                         app:startIconDrawable="@drawable/time_icon">
 
@@ -146,7 +146,7 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Description"
+                    android:hint="@string/desc"
                     app:counterEnabled="true"
                     app:counterMaxLength="300"
                     app:errorEnabled="true"
@@ -167,7 +167,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:checked="true"
-                    android:text="Physical location" />
+                    android:text="@string/physical_place" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -180,6 +180,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="4"
+                        android:gravity="center"
                         android:text="Khabarovsk" />
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -189,7 +190,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_weight="1"
-                        android:hint="Location"
+                        android:hint="@string/location"
                         app:counterEnabled="true"
                         app:counterMaxLength="30"
                         app:errorEnabled="true"
@@ -210,21 +211,21 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Public event" />
+                    android:text="@string/public_event" />
 
                 <Switch
                     android:id="@+id/emailSwitch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Show my email" />
+                    android:text="@string/show_my_email" />
 
                 <Switch
                     android:id="@+id/numberSwitch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:text="Show my phone number" />
+                    android:text="@string/show_my_phone" />
 
                 <Button
                     android:id="@+id/createEventBut"
@@ -234,7 +235,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginRight="10dp"
-                    android:text="Create" />
+                    android:text="@string/add_event" />
 
             </LinearLayout>
         </ScrollView>

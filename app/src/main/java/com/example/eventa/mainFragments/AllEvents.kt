@@ -19,6 +19,7 @@ import com.example.eventa.User
 import com.example.eventa.recyclerViews.allEventsAdapter
 import com.example.eventa.viewModels.allEventsViewModel
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AllEvents : Fragment() {
@@ -31,7 +32,7 @@ class AllEvents : Fragment() {
     private var adapter: allEventsAdapter? = null
     private lateinit var v: View
     private lateinit var model: allEventsViewModel
-    val data = arrayOf(User.city, "Global")
+    private lateinit var data: Array<String>
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -42,6 +43,7 @@ class AllEvents : Fragment() {
         val i = inflater.inflate(R.layout.fragment_all_events, container, false)
 
         activity?.title = ""
+        data = arrayOf(User.city, activity?.resources?.getString(R.string.global)!!)
 
         prBar = i.findViewById(R.id.progressBar)
         prBar.isEnabled = false
@@ -54,7 +56,8 @@ class AllEvents : Fragment() {
 
         swipeR = i.findViewById(R.id.swiperefresh)
         swipeR.setOnRefreshListener {
-            updateData(data[spinner.selectedItemPosition])
+            var city = if (spinner.selectedItemPosition == 0) data[0] else "Global"
+            updateData(city!!)
             swipeR.isRefreshing = false
         }
 
@@ -90,7 +93,7 @@ class AllEvents : Fragment() {
             }
             else{
                 spinner.setSelection(0, false)
-                updateData(data[0])
+                updateData(data[0]!!)
             }
         }
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
@@ -101,7 +104,10 @@ class AllEvents : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val city = model.city ?: "Global"
                 if (city != data[spinner.selectedItemPosition] || model.email != User.email || model.age != User.age){
-                    updateData(data[position])
+                    when (position){
+                        0 -> updateData(data[0]!!)
+                        1 -> updateData("Global")
+                    }
                 }
             }
 
@@ -129,7 +135,7 @@ class AllEvents : Fragment() {
         val search = menu.findItem(R.id.action_search)
         search.isVisible = true
         val searchView = search.actionView as SearchView?
-        searchView?.queryHint = "Search by title or id..."
+        searchView?.layoutParams?.width = ViewGroup.LayoutParams.MATCH_PARENT
         searchView?.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -137,8 +143,9 @@ class AllEvents : Fragment() {
                 keywords.forEachIndexed { index, s ->
                     keywords[index] = s.toLowerCase()
                 }
-                val city = data[spinner.selectedItemPosition]
-                updateData(city, keywords)
+
+                val city = if (spinner.selectedItemPosition == 0) data[0] else "Global"
+                updateData(city!!, keywords)
                 return true
             }
 

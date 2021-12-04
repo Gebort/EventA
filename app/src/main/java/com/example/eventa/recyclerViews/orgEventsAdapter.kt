@@ -90,7 +90,7 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
             h.loc?.text = "${events[i]!!.city}, ${events[i]!!.loc}"
         }
         else{
-            h.loc?.text = events[i]!!.loc
+            h.loc?.text = rView.resources.getString(R.string.no_place)
         }
         h.number?.text = "${events[i].currPartNumber}/${events[i].partNumber}"
         h.time?.text = timeStr
@@ -113,7 +113,7 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
             h.requestsButton?.visibility = View.GONE
             h.requestsImage?.visibility = View.GONE
         }
-        h.orgName?.text = "Organisator - ${events[i].orgName}"
+        h.orgName?.text = String.format(rView.context.resources.getString(R.string.organisator), events[i].orgName)
         h.title?.text = events[i].title
         h.delete?.isEnabled = true
         h.edit?.isEnabled = true
@@ -125,7 +125,7 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
         }
 
         if(events[i].showEmail){
-            h.orgEmail?.text = "Email - ${events[i].orgEmail}"
+            h.orgEmail?.text = String.format(rView.context.resources.getString(R.string.organisator_email), events[i].orgEmail)
             h.orgEmail?.visibility = View.VISIBLE
         }
         else{
@@ -133,7 +133,7 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
             h.orgEmail?.visibility = View.INVISIBLE
         }
         if(events[i].showNumber){
-            h.orgPhone?.text = "Phone - ${events[i].orgPhone}"
+            h.orgPhone?.text = String.format(rView.context.resources.getString(R.string.organisator_phone), events[i].orgPhone)
             h.orgPhone?.visibility = View.VISIBLE
         }
         else{
@@ -163,10 +163,10 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
                         .setItems(items) { _, which ->
                             MaterialAlertDialogBuilder(rView.context)
                                     .setMessage(String.format(rView.context.resources.getString(R.string.kick_participant), items?.get(which)))
-                                    .setNegativeButton("Cancel"){ dialog, _ ->
+                                    .setNegativeButton(R.string.no){ dialog, _ ->
                                         dialog.cancel()
                                     }
-                                    .setPositiveButton("Yes"){ _, _ ->
+                                    .setPositiveButton(R.string.yes){ _, _ ->
                                         DBHelper.removeParticipant(events[i].id.toString(), items?.get(which)!!){ result ->
                                             onRemoveResult(result)
                                         }
@@ -185,10 +185,10 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
                         .setItems(items) { _, which ->
                             MaterialAlertDialogBuilder(rView.context)
                                     .setMessage(String.format(rView.context.resources.getString(R.string.add_participant), items?.get(which)))
-                                    .setNegativeButton("Cancel"){ dialog, _ ->
+                                    .setNegativeButton(R.string.no){ dialog, _ ->
                                         dialog.cancel()
                                     }
-                                    .setPositiveButton("Yes"){ _, _ ->
+                                    .setPositiveButton(R.string.yes){ _, _ ->
                                         DBHelper.removeRequestAddParticipant(events[i].id.toString(), items?.get(which)!!){ result ->
                                             onAddResult(result)
                                         }
@@ -217,10 +217,10 @@ class orgEventsAdapter(var events: MutableList<Event>, val rView: RecyclerView):
 
             MaterialAlertDialogBuilder(rView.context)
                 .setMessage(String.format(rView.context.resources.getString(R.string.event_delete_confirm), events[i].title))
-                .setNegativeButton("Cancel"){ dialog, _ ->
+                .setNegativeButton(R.string.no){ dialog, _ ->
                     dialog.cancel()
                 }
-                .setPositiveButton("Yes"){ _, _ ->
+                .setPositiveButton(R.string.yes){ _, _ ->
                     DBHelper.deleteEvent(events[i].id.toString()){ result ->
                         onDeleteResult(result)
                     }

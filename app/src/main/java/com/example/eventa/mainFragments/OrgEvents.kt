@@ -87,10 +87,10 @@ class OrgEvents : Fragment() {
         }
 
         if (!edit) {
-            activity?.title = "New event"
+            activity?.title = activity?.resources?.getString(R.string.add_event)
         }
         else{
-            activity?.title = "Edit event"
+            activity?.title = activity?.resources?.getString(R.string.edit_event)
         }
 
         eventInput = i.findViewById(R.id.titleInput)
@@ -142,7 +142,7 @@ class OrgEvents : Fragment() {
                 val selection = if (!edit) MaterialDatePicker.todayInUtcMilliseconds() else eventToChange?.date
                 val picker =
                         MaterialDatePicker.Builder.datePicker()
-                                .setTitleText("Select your event date")
+                                .setTitleText(R.string.pick_date)
                                 .setSelection(selection)
                                 .setCalendarConstraints(constraintsBuilder.build())
                                 .build()
@@ -168,7 +168,7 @@ class OrgEvents : Fragment() {
                 val picker =
                         MaterialTimePicker.Builder()
                                 .setTimeFormat(clockFormat)
-                                .setTitleText("Event starting time")
+                                .setTitleText(R.string.pick_time)
                                 .build()
 
                 picker.addOnPositiveButtonClickListener {
@@ -186,10 +186,10 @@ class OrgEvents : Fragment() {
 
 
         if (!edit){
-            createBut.text = "Create new event"
+            createBut.text = activity?.resources?.getString(R.string.add_event)
         }
         else{
-            createBut.text = "Edit the event"
+            createBut.text = activity?.resources?.getString(R.string.edit_event)
             eventInput.setText(eventToChange?.title)
             partNumbInput.setText(eventToChange?.partNumber.toString())
             ageInput.setText(eventToChange?.minAge.toString())

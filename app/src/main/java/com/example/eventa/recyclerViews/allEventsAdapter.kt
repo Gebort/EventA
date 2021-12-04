@@ -118,7 +118,7 @@ class allEventsAdapter(val rView: RecyclerView, var visibleThreshold: Int, var e
                     h.loc?.text = "${events[i]!!.city}, ${events[i]!!.loc}"
                 }
                 else{
-                    h.loc?.text = events[i]!!.loc
+                    h.loc?.text = rView.resources.getString(R.string.no_place)
                 }
                 h.lock?.isVisible = !events[i]!!.public
                 h.public?.isVisible = !events[i]!!.public

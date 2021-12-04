@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="-16dp"
                     android:gravity="center|right"
-                    android:text="Unsign"
+                    android:text="@string/unsign"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/orgPhoneText" />
 

@@ -44,7 +44,7 @@ class Settings : Fragment() {
     ): View? {
         val i = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        activity?.title = "Profile"
+        activity?.title = activity?.resources?.getString(R.string.profile)
 
         nameInput = i.findViewById(R.id.nameInput)
         phoneInput = i.findViewById(R.id.phoneInput)

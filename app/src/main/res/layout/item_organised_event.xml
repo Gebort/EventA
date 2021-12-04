@@ -124,10 +124,9 @@
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-16dp"
                     android:layout_marginEnd="16dp"
                     android:gravity="center|right"
-                    android:text="Delete"
+                    android:text="@string/delete"
                     app:layout_constraintEnd_toStartOf="@+id/editBut"
                     app:layout_constraintTop_toBottomOf="@+id/orgPhoneText" />
 
@@ -135,7 +134,7 @@
                     android:id="@+id/editBut"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Edit"
+                    android:text="@string/edit"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
