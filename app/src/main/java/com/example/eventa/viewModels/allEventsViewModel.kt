@@ -55,8 +55,6 @@ class allEventsViewModel : ViewModel() {
             DBHelper.loadAvalEvents(city, eventCount.toLong(), keywords){ event, result ->
                 onAllEventsResult(event, result)
             }
-
-          //  delayUpdateCheck()
         }
         else
             Log.d("allEventsViewModel", "No input data, cant load all events")

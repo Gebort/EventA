@@ -50,7 +50,6 @@ class followedEventsViewModel : ViewModel() {
         }
     }
 
-    //TODO сделать перезапись журнала уведомлений при закрытии приложения, чтобы избежать накопления лишней информации
     fun addNotification(index: Int){
         if (!events.value!![index].notification) {
             _notifications.value = _notifications.value?.plus(1)

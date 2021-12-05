@@ -76,7 +76,7 @@ class AllEvents : Fragment() {
                 if (adapter!!.isLoading){
                     adapter!!.events.add(null)
                 }
-                onEventsResult(model.change, model.pos, model.getEvents().value!!.size)
+                onEventsResult(model.change, model.pos)
             })
         }
 
@@ -182,7 +182,7 @@ class AllEvents : Fragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun onEventsResult(type: allEventsViewModel.Types, pos: Int, size: Int) {
+    fun onEventsResult(type: allEventsViewModel.Types, pos: Int) {
         prBar.visibility = View.INVISIBLE
         prBar.isEnabled = false
 

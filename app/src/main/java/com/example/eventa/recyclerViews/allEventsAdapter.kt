@@ -148,8 +148,6 @@ class allEventsAdapter(val rView: RecyclerView, var visibleThreshold: Int, var e
                         addParticipant(events[i]!!.id!!, User.email)
                     }
                     else{
-                        val b = User.email
-                        val c = events[i]!!.id!!
                         addRequest(events[i]!!.id!!, User.email)
                     }
                 }

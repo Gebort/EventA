@@ -19,10 +19,10 @@ import kotlin.reflect.KFunction1
 
 object DBHelper {
 
-    var avalEventsListener: ListenerRegistration? = null
-    var followedEventsListener: ListenerRegistration? = null
-    var orgEventsListener: ListenerRegistration? = null
-    val events = "events"
+    private var avalEventsListener: ListenerRegistration? = null
+    private var followedEventsListener: ListenerRegistration? = null
+    private var orgEventsListener: ListenerRegistration? = null
+    private val events = "events"
 
      @RequiresApi(Build.VERSION_CODES.O)
      fun emailCheck(
@@ -185,9 +185,9 @@ object DBHelper {
     fun loadAvalEvents(city: String?, count: Long, keywords: MutableList<String>, callback: (Event, allEventsViewModel.Types) -> Unit) {
         val db = Firebase.firestore
 
-        avalEventsListener?.remove()
         val now = ZonedDateTime.now(ZoneOffset.UTC)
-        
+
+        avalEventsListener?.remove()
         avalEventsListener = db.collection(events).whereEqualTo("city", city).whereArrayContainsAny("keywords", keywords).whereGreaterThan("date", now.toEpochSecond()*1000).orderBy("date").limit(count)
                 .addSnapshotListener { value, error ->
                     if (error != null) {
@@ -212,9 +212,6 @@ object DBHelper {
                                         }
                                         DocumentChange.Type.REMOVED -> {
                                             callback(event, allEventsViewModel.Types.REMOVED)
-                                        }
-                                        else ->{
-                                            val foo = 5
                                         }
                                     }
                                 }
